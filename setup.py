@@ -7,22 +7,22 @@ setup(name='sbi4abm',
       author='Joel Dyer',
       author_email='joel.dyer@maths.ox.ac.uk',
       license='AGPLv3',
-      packages=find_packages(exclude=["tests", "*.tests", "*.tests.*", "tests.*"])
-)
-
-REQUIRED = [
-    "arviz",
-    "joblib>=1.0.0",
-    "matplotlib",
-    "numba",
-    "numpy",
-    "pillow",
-    "POT",
-    "pyknos>=0.14.2",
-    "pyro-ppl>=1.3.1",
-    "scikit-learn",
-    "scipy",
-    "tensorboard",
-    "torch>=1.8.0",
-    "tqdm",
-]
+      packages=find_packages(exclude=["tests", "*.tests", "*.tests.*", "tests.*"]),
+      install_requires = [
+          "arviz",
+          "joblib>=1.0.0",
+          "matplotlib",
+          "numba",
+          "numpy",
+          "pillow",
+          "POT",
+          "pyknos>=0.14.2",
+          "pyro-ppl>=1.3.1",
+          "scikit-learn",
+          "scipy",
+          "tensorboard",
+          "torch>=1.8.0",
+          "torch_geometric",
+          "torch_geometric_temporal",
+          "tqdm"]
+      )
