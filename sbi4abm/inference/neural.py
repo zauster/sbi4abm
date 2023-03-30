@@ -3,7 +3,8 @@ from sbi4abm.sbi import inference, utils
 from sbi4abm.sbi.inference import SNPE, SNRE, SNRE_A, simulate_for_sbi, prepare_for_sbi
 from torch import nn
 
-from sbi4abm.networks import graph, recurrent_graphs, time_series
+# from sbi4abm.networks import graph, recurrent_graphs, time_series
+from sbi4abm.networks import time_series
 from sbi4abm.utils import io, sampling
 
 
