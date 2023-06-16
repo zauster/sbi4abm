@@ -1,0 +1,8 @@
+/venv_sbi4abm/
+*.pkl
+samples.txt
+/results/*/
+/results_test/*/
+/sbi4abm/*/__pycache__/
+/sbi4abm/*/*/__pycache__/
+/sbi4abm/*/*/*/__pycache__/
