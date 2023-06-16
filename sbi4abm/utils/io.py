@@ -36,6 +36,8 @@ def _name2T(name):
 		T = 100
 	elif name == "hop":
 		T = 25#50
+	elif name == "MultiIndustryABM":
+		T = 300
 	return T
 
 def _load_simulator(task_name):
@@ -53,6 +55,8 @@ def _load_simulator(task_name):
 		model = Hopfield.Model(N=50, K=2, initial_state=initial_state)
 	elif task_name == "mvgbm":
 		model = MVGBM.Model()
+	elif task_name == "MultiIndustryABM":
+		model = MultiIndustryABM.Model()
 
 	simulator = Simulator(model, _name2T(task_name))
 
@@ -78,10 +82,13 @@ def _load_prior(task_name):
 	elif task_name == "mvgbm":
 		prior = utils.BoxUniform(low=torch.tensor([-1.,-1.,-1.]),
 								 high=torch.tensor([1., 1., 1.]))
+	elif task_name == "MultiIndustryABM":
+		prior = utils.BoxUniform(low=torch.tensor([0.]),
+					 high=torch.tensor([1.]))
 	return prior
-	
+
 def _load_dataset(task_name):
-	
+
 	if task_name == "bh_noisy":
 		y = np.loadtxt(os.path.join(this_dir, "../data/BH_Noisy/obs.txt"))
 	elif task_name == "bh_smooth":
@@ -94,6 +101,9 @@ def _load_dataset(task_name):
 		y = np.load(os.path.join(this_dir, "../data/Hopfield/small_graph_correct.npy"))
 	elif task_name == "mvgbm":
 		y = np.loadtxt(os.path.join(this_dir, "../data/MVGBM/obs.txt"))[1:]
+		# print("MVGBM input: ", y)
+	elif task_name == "MultiIndustryABM":
+		y = np.loadtxt(os.path.join(this_dir, "../data/MultiIndustryABM/obs.txt"))[1:]
 	return y
 
 def _load_true_pars(task_name):
@@ -110,6 +120,8 @@ def _load_true_pars(task_name):
 		theta = np.array([1., 0.8, 0.5])
 	elif task_name == "mvgbm":
 		theta = np.array([0.2,-0.5,0.])
+	elif task_name == "MultiIndustryABM":
+		theta = np.array([0.25])
 	return theta
 
 def load_task(task_name):
