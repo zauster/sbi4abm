@@ -136,6 +136,11 @@ def _neural_prepare_estimator_observation(args, y, simulator):
 		if args.task == "fw_hpm":
 			sim_pp = lambda x: (x[:, 1:] - x[:, :-1]).unsqueeze(-1)
 
+		if args.task in ["MultiIndustryABM"]:
+			_ = simulator(prior.sample())
+			N = -1
+			sim_pp = lambda x: x.reshape(-1, _.shape[0], _.shape[1])
+
 		if args.task in ["mvgbm"]:
 			_ = simulator(prior.sample())
 			N = -1
@@ -200,10 +205,12 @@ def _neural_prepare_estimator_observation(args, y, simulator):
 	return density_estimator, sbi_method, y, simulator, sim_pp, z_score_x
 
 def _get_postprocessor(args):
-	
 	sim_pp = lambda x: x.unsqueeze(-1)
 	if args.task == "fw_hpm":
 		sim_pp = lambda x: (x[:, 1:] - x[:, :-1]).unsqueeze(-1)
+	if args.task in ["MultiIndustryABM"]:
+		_ = simulator(prior.sample())
+		sim_pp = lambda x: x.reshape(-1, _.shape[0], _.shape[1])
 	if args.task in ["mvgbm"]:
 		_ = simulator(prior.sample())
 		sim_pp = lambda x: x.reshape(-1, _.shape[0], _.shape[1])
