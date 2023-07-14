@@ -6,7 +6,7 @@ from sbi4abm.sbi import utils
 import time
 import torch
 
-from sbi4abm.models import BrockHommes, FrankeWesterhoff, Hopfield, MVGBM
+from sbi4abm.models import BrockHommes, FrankeWesterhoff, Hopfield, MVGBM, MultiIndustryABM
 
 this_dir = os.path.dirname(os.path.realpath(__file__))
 
@@ -103,7 +103,7 @@ def _load_dataset(task_name):
 		y = np.loadtxt(os.path.join(this_dir, "../data/MVGBM/obs.txt"))[1:]
 		# print("MVGBM input: ", y)
 	elif task_name == "MultiIndustryABM":
-		y = np.loadtxt(os.path.join(this_dir, "../data/MultiIndustryABM/obs.txt"))[1:]
+		y = np.loadtxt(os.path.join(this_dir, "../data/MultiIndustryABM/obs.txt"))##[0:]
 	return y
 
 def _load_true_pars(task_name):
