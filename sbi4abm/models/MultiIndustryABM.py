@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 import time
 import subprocess
-# import random
+import random
 
 # self = Model()
 
@@ -14,7 +14,7 @@ class Model:
                 self.base_path = "/home/reitero/Arbeit/Projects/local/2023_OeNB_GeneticOptimisation_ABM/"
                 self.model_path = os.path.join("/home/reitero/Arbeit/Projects/local/2023_OeNB_GeneticOptimisation_ABM/",
                                                "models", "MultiIndustry_ABM")
-                self.sock_file = "/run/user/1000/julia-daemon/conduktor.sock"
+                self.sock_file = "/run/user/1000/julia-daemon/conductor.sock"
 
                 self.config = toml.load(os.path.join(self.model_path,
                                                      "model_config.toml"))
@@ -44,29 +44,35 @@ class Model:
                 with open(tmpfilename, "w") as outputfile:
                         toml.dump(self.config, outputfile)
 
-                # # does not really change anything: the print statement is
-                # # shown every time, but the command is anyway started
-                # # successfully...
-                # while_counter = 0
-                # while not os.path.exists(self.sock_file):
-                #         time.sleep(random.uniform(0.01, 0.1))
-                #         while_counter += 1
-                #         if while_counter > 100:
-                #                 print("Unable to access socket file!")
-                #                 break
+                # wait for a small random amount of time until the socket file
+                # is available and a new client can be dispatched:
+                while_counter = 0
+                while not os.path.exists(self.sock_file):
+                        time.sleep(random.uniform(0.01, 0.1))
+                        while_counter += 1
+                        if while_counter > 10000:
+                                print("Unable to access socket file!")
+                                break
+
 
                 ## start simulation, get output directory
-                cmd_call_list = ["juliaclient",
+                cmd_call_list = [
+                        "juliaclient",
+                        # "-E 'getpid()'" ## would work
                                  f"--project={self.model_path}",
-                                 os.path.join(self.base_path,
-                                              "Calibration", "src",
-                                              "run_one_simulation.jl"),
-                                 f"--config_file {tmpfilename}",
-                                 f"--output_dir {self.experiment_dir}",
-                                 f"--random_seed {simulation_number}"]
+                        os.path.join(self.base_path,
+                                     "Calibration", "src",
+                                     "run_one_simulation.jl"),
+                        # f"--config_file {tmpfilename}",
+                                 f"-c={tmpfilename}",
+                        # f"--output_dir {self.experiment_dir}",
+                                 f"-o={self.experiment_dir}",
+                        # f"--random_seed {simulation_number}"
+                                 f"-r={simulation_number}"
+                ]
                 cmd_call = " ".join(cmd_call_list)
-                # print(cmd_call)
-                returncode = subprocess.call(cmd_call, shell = True)
+                print(cmd_call)
+                returncode = subprocess.call(cmd_call_list, shell = False)
 
                 ## return time series of interest
                 if returncode == 0:
@@ -76,14 +82,19 @@ class Model:
                                                               "sim_" + str(simulation_number),
                                                               "data",
                                                               "Model.parquet"),
-                                                 columns = ["period", "real_GDP", "unemployment_rate"])
+                                                 columns = ["period", "real_GDP", "unemployment_rate"],
+                                                 ## pyarrow does not work when called in parallel processes
+                                                 engine = "fastparquet"
+                                                 )
                         res_dt = res_dt[res_dt["period"] >= 1].drop(columns = ["period"])
                         res_array = res_dt.to_numpy()
                         # print("[Simulate] Res array: ", res_array.shape)
+                        # res_array = np.zeros((100, 2))
                 else:
-                        print("=> Simulation failed!")
-                        res_array = np.zeros((1, 1))
+                        print("  => Simulation failed!")
+                        raise Exception("Simulation did not terminate successfully!")
 
+                # print("=> Simulation call finished")
                 return res_array
 
                 # self.dt = 1./(T - 1)

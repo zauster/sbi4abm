@@ -7,8 +7,8 @@ import time
 import subprocess
 
 base_path = "/home/reitero/Arbeit/Projects/local/2023_OeNB_GeneticOptimisation_ABM/models/MultiIndustry_ABM/"
-config = toml.load(os.path.join(base_path,
-								"model_config.toml"))
+# config = toml.load(os.path.join(base_path,
+# 								"model_config.toml"))
 # experiment_dir = "sbi4abm_results"
 experiment_dir = "test"
 simulation_number = 1
