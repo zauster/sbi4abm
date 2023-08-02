@@ -26,7 +26,7 @@
 # sure it connects to the right socket.
 
 # export JULIA_DAEMON_SERVER=/run/user/1000/julia/
-export JULIA_DAEMON_WORKER_MAXCLIENTS=1
+# export JULIA_DAEMON_WORKER_MAXCLIENTS=2
 # export JULIA_DAEMON_WORKER_ARGS="--startup-file=no"
 
 
@@ -34,5 +34,5 @@ python sbi4abm/utils/job_script.py \
     --task MultiIndustryABM \
     --method maf_gru \
     --outloc results \
-    --nsims 10x2 \
-    --nw 1
+    --nsims 20x1 \
+    --nw 3
