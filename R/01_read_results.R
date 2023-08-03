@@ -44,7 +44,7 @@ p1 <- ggplot(res_dt, aes(x = value)) +
   facet_wrap(~ variable)
 p1
 
-p2 <- ggplot(res_dt, aes(x = value)) +
-  geom_density(aes(colour = embedding), linewidth = 1) +
-  facet_grid(network ~ variable)
-p2
+## p2 <- ggplot(res_dt, aes(x = value)) +
+##   geom_density(aes(colour = embedding), linewidth = 1) +
+##   facet_grid(network ~ variable)
+## p2

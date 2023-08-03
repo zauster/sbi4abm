@@ -1,10 +1,12 @@
-
+## start a fresh REPL at this file location
 import os
 import toml
 import pandas as pd
 import numpy as np
 import time
 import subprocess
+
+os.getcwd()
 
 base_path = "/home/reitero/Arbeit/Projects/local/2023_OeNB_GeneticOptimisation_ABM/models/MultiIndustry_ABM/"
 # config = toml.load(os.path.join(base_path,
