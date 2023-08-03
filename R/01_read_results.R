@@ -4,7 +4,8 @@ suppressMessages(library(here))
 setwd(here::here())
 
 result_dirs <- list.dirs("results", full.names = TRUE, recursive = FALSE)
-input_dir <- result_dirs[1]
+result_dirs <- result_dirs[length(result_dirs)]
+input_dir <- result_dirs[length(result_dirs)]
 
 result_list <- list()
 for(input_dir in result_dirs) {

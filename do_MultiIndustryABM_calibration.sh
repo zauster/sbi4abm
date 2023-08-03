@@ -34,5 +34,5 @@ python sbi4abm/utils/job_script.py \
     --task MultiIndustryABM \
     --method maf_gru \
     --outloc results \
-    --nsims 20x1 \
-    --nw 3
+    --nsims 100x10 \
+    --nw 5
