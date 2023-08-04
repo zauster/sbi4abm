@@ -31,6 +31,7 @@ class Model:
 
 
         def simulate(self, pars = None, T = 100, seed = None):
+                time.sleep(random.uniform(0.1, 0.5))
                 params = np.array([float(pars[i]) for i in range(1)])
                 self.config["expectation_react_param"] = float(params[0])
 
@@ -73,8 +74,8 @@ class Model:
                                 # f"--random_seed {simulation_number}"
                                          f"-r={simulation_number}"
                         ]
-                        # cmd_call = " ".join(cmd_call_list)
-                        # print(cmd_call)
+                        cmd_call = " ".join(cmd_call_list)
+                        print(cmd_call)
                         returncode = subprocess.call(cmd_call_list, shell = False)
 
                         ## return time series of interest
