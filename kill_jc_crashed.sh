@@ -3,6 +3,8 @@
 KILLSWITCH="off"
 SLEEPTIME=5
 
+echo $$ > /tmp/kill_jc_crashed.pid
+
 while :
 do
     TOPPROCESS=$(top -b -n 1 | sed 1,6d | sed -n 2p)

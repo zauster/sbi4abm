@@ -29,6 +29,7 @@
 # export JULIA_DAEMON_WORKER_MAXCLIENTS=2
 # export JULIA_DAEMON_WORKER_ARGS="--startup-file=no"
 
+./kill_jc_crashed.sh > kill_jc.log &
 
 python sbi4abm/utils/job_script.py \
     --task MultiIndustryABM \
@@ -36,3 +37,5 @@ python sbi4abm/utils/job_script.py \
     --outloc results \
     --nsims 100x10 \
     --nw 5
+
+cat /tmp/kill_jc_crashed.pid | xargs kill
