@@ -83,8 +83,8 @@ def _load_prior(task_name):
 		prior = utils.BoxUniform(low=torch.tensor([-1.,-1.,-1.]),
 								 high=torch.tensor([1., 1., 1.]))
 	elif task_name == "MultiIndustryABM":
-		prior = utils.BoxUniform(low=torch.tensor([0.]),
-					 high=torch.tensor([1.]))
+		prior = utils.BoxUniform(low=torch.tensor([0.1]),
+					 high=torch.tensor([1.0]))
 	return prior
 
 def _load_dataset(task_name):
