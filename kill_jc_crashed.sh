@@ -13,7 +13,7 @@ do
     TOPCPU=$(echo $TOPPROCESS | awk '{print $9}' | cut -d"," -f1)
     echo "$TOPPROCESSNAME (pid=$TOPPID): $TOPCPU %. Killswitch=$KILLSWITCH"
 
-    if [ $TOPCPU -gt 95 ] && [ $TOPPROCESSNAME == "juliaclient" ] ; then
+    if [ $TOPCPU -gt 95 ] && [ $TOPPROCESSNAME == "juliacl+" ] ; then
         echo "-> Top process is a julia process"
         if [ $KILLSWITCH == "off" ] ; then
             echo "-> Setting killswitch to 'on'"
