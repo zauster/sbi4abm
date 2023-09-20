@@ -77,12 +77,15 @@ def sbi_training(simulator,
 	elif method == "SNRE":
 		inference = SNRE(prior=sbi_prior, classifier=density_estimator)
 
+	round_counter = 0
 	for sim_count in n_sims:
+		round_counter += 1
+		print("Simulation round", round_counter, "of", len(n_sims))
 		theta, x = simulate_for_sbi(sbi_simulator, proposal, num_simulations=sim_count,
 									num_workers=num_workers)
 		# This is usually for reshaping for the embedding net
 		x = sim_postprocess(x)
-		print("Shape of simulated batch of data", x.size())
+		# print("Shape of simulated batch of data", x.size())
 		if method == "SNPE":
 			density_estimator = inference.append_simulations(theta, x, proposal=proposal)
 			print("Train")
