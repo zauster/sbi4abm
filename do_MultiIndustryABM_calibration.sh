@@ -29,13 +29,21 @@
 # export JULIA_DAEMON_WORKER_MAXCLIENTS=2
 # export JULIA_DAEMON_WORKER_ARGS="--startup-file=no"
 
+# echo "=> Restarting julia-daemon.service"
+# systemctl --user restart julia-daemon.service
+# sleep 2
+
 ./kill_jc_crashed.sh > kill_jc.log &
 
+echo "=> Running the sbi4abm algorithm"
 python sbi4abm/utils/job_script.py \
     --task MultiIndustryABM \
     --method maf_gru \
     --outloc results \
-    --nsims 100x10 \
-    --nw 5
+    --nsims 500x10 \
+    --nw 10
+
+
+# --method resnet_gru \ ## seems to work fine
 
 cat /tmp/kill_jc_crashed.pid | xargs kill

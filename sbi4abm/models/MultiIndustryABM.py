@@ -5,21 +5,26 @@ import numpy as np
 import time
 import subprocess
 import random
+import string
 
 # self = Model()
 
 class Model:
         def __init__(self):
                 # self.base_path = "/home/reitero/Arbeit/Projects/local/2023_OeNB_GeneticOptimisation_ABM/models/MultiIndustry_ABM/"
-                self.base_path = "/home/reitero/Arbeit/Projects/local/2023_OeNB_GeneticOptimisation_ABM/"
-                self.model_path = os.path.join("/home/reitero/Arbeit/Projects/local/2023_OeNB_GeneticOptimisation_ABM/",
-                                               "models", "MultiIndustry_ABM")
+                self.base_path = "/mnt/extData3/2023_OeNB_GeneticOptimisation_ABM/"
+                self.model_path = os.path.join(self.base_path, "models", "MultiIndustry_ABM")
+                self.calibration_path = os.path.join(self.base_path, "Calibration")
                 self.sock_file = "/run/user/1000/julia-daemon/conductor.sock"
 
                 self.config = toml.load(os.path.join(self.model_path,
                                                      "model_config.toml"))
-                # self.experiment_dir = "sbi4abm_results"
-                self.experiment_dir = "test"
+                ## for these simulations, the aggregate output is enough
+                self.config["save_output"] = "aggregates"
+
+                self.experiment_dir = "sbi4abm_results"
+                # self.experiment_dir = "test"
+                self.empirical_parameters_file = self.config["empirical_parameters_file"]
 
                 # self.x0 = x0
                 # self.dt = None
@@ -32,8 +37,24 @@ class Model:
 
         def simulate(self, pars = None, T = 100, seed = None):
                 time.sleep(random.uniform(0.1, 0.5))
-                params = np.array([float(pars[i]) for i in range(1)])
+                params = np.array([float(pars[i]) for i in range(len(pars))])
                 self.config["expectation_react_param"] = float(params[0])
+                self.config["markup_react_param"] = float(params[1]) ## 0.001
+
+                # desired_inventory_ratio = 0.05 #0.05
+                # desired_intermediate_inputs_inventory_factor = 3.0
+                # financial_needs_buffer_factor = 1.2
+                # unemployment_wage_revision_threshold = 0.08
+                # budget_react_param = 0.1 # assumption
+
+                ## copy xlsx file to a random filename
+                xlsx_filename = "".join(["sbi4abm_configs/", "".join(random.choices(string.ascii_lowercase, k = 6)), ".xlsx"])
+                old_xlsx_filepath = os.path.join(self.model_path, self.empirical_parameters_file)
+                new_xlsx_filepath = os.path.join(self.model_path, xlsx_filename)
+                cmd_call = " ".join(["cp", old_xlsx_filepath, new_xlsx_filepath])
+                # print(cmd_call)
+                returncode = subprocess.call(cmd_call, shell = True)
+                self.config["empirical_parameters_file"] = xlsx_filename
 
                 tested_random_numbers = []
                 while True:
@@ -48,6 +69,19 @@ class Model:
                         with open(tmpfilename, "w") as outputfile:
                                 toml.dump(self.config, outputfile)
 
+                        ## start simulation, get output directory
+                        cmd_call_list = [
+                                "juliaclient",
+                                f"--project={self.calibration_path}",
+                                os.path.join(self.calibration_path,
+                                             "src", "run_one_simulation.jl"),
+                                f"--config_file={tmpfilename}",
+                                f"--output_dir={self.experiment_dir}",
+                                f"--random_seed={simulation_number}"
+                        ]
+                        cmd_call = " ".join(cmd_call_list)
+                        # print(cmd_call)
+
                         # wait for a small random amount of time until the socket file
                         # is available and a new client can be dispatched:
                         while_counter = 0
@@ -58,24 +92,6 @@ class Model:
                                         print("Unable to access socket file!")
                                         break
 
-
-                        ## start simulation, get output directory
-                        cmd_call_list = [
-                                "juliaclient",
-                                # "-E 'getpid()'" ## would work
-                                         f"--project={self.model_path}",
-                                os.path.join(self.base_path,
-                                             "Calibration", "src",
-                                             "run_one_simulation.jl"),
-                                # f"--config_file {tmpfilename}",
-                                         f"-c={tmpfilename}",
-                                # f"--output_dir {self.experiment_dir}",
-                                         f"-o={self.experiment_dir}",
-                                # f"--random_seed {simulation_number}"
-                                         f"-r={simulation_number}"
-                        ]
-                        cmd_call = " ".join(cmd_call_list)
-                        print(cmd_call)
                         returncode = subprocess.call(cmd_call_list, shell = False)
 
                         ## return time series of interest
@@ -86,7 +102,14 @@ class Model:
                                                                       "sim_" + str(simulation_number),
                                                                       "data",
                                                                       "Model.parquet"),
-                                                         columns = ["period", "real_GDP", "unemployment_rate"],
+                                                         columns = ["period",
+                                                                    "real_GDP_growth",
+                                                                    "real_GDP__primary",
+                                                                    "real_GDP__manufacturing",
+                                                                    "real_GDP__energy",
+                                                                    "real_GDP__services",
+                                                                    "inflation_rate",
+                                                                    "unemployment_rate"],
                                                          ## pyarrow does not work when called in parallel processes
                                                          engine = "fastparquet"
                                                          )
@@ -95,13 +118,14 @@ class Model:
                                 # print("[Simulate] Res array: ", res_array.shape)
                                 # res_array = np.zeros((100, 2))
                                 break
-                        elif len(tested_random_numbers) >= 3:
+                        elif len(tested_random_numbers) >= 5:
                                 print("  => Simulation failed!")
                                 print("     Tested random numbers: ", tested_random_numbers)
                                 raise Exception("Maximum number of retries: Simulation did not terminate successfully!")
                         else:
                                 continue ## do another test with a different random seed
 
+                returncode = subprocess.call(["rm", new_xlsx_filepath], shell = False)
                 return res_array
 
 
