@@ -38,14 +38,13 @@ class Model:
         def simulate(self, pars = None, T = 100, seed = None):
                 time.sleep(random.uniform(0.1, 0.5))
                 params = np.array([float(pars[i]) for i in range(len(pars))])
-                self.config["expectation_react_param"] = float(params[0])
+                self.config["expectation_react_param"] = float(params[0]) ## 0.25
                 self.config["markup_react_param"] = float(params[1]) ## 0.001
-
-                # desired_inventory_ratio = 0.05 #0.05
-                # desired_intermediate_inputs_inventory_factor = 3.0
-                # financial_needs_buffer_factor = 1.2
-                # unemployment_wage_revision_threshold = 0.08
-                # budget_react_param = 0.1 # assumption
+                self.config["desired_inventory_ratio"] = float(params[2]) ## 0.05
+                self.config["desired_intermediate_inputs_inventory_factor"] = float(params[3]) ## 3
+                self.config["financial_needs_buffer_factor"] = float(params[4]) ## 1.2
+                self.config["unemployment_wage_revision_threshold"] = float(params[5]) ## 0.08
+                # self.config["budget_react_param"] = float(params[6]) ## 0.1
 
                 ## copy xlsx file to a random filename
                 xlsx_filename = "".join(["sbi4abm_configs/", "".join(random.choices(string.ascii_lowercase, k = 6)), ".xlsx"])
