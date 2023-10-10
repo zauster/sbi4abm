@@ -323,7 +323,7 @@ if __name__ == "__main__":
 							 "non-amortised density (ratio) estimators " + 
 							 "exists; consider resubmitting this job with " +
 							 "one training round")
-				raise NotImplemented(error_msg)
+				raise NotImplementedError(error_msg)
 
 		#sim_pp = _get_postprocessor(args)
 
