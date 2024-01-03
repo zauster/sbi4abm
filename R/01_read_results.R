@@ -3,9 +3,13 @@ library(data.table)
 suppressMessages(library(here))
 setwd(here::here())
 library(ggplot2)
+library(ggthemes)
 
+## result_basedir <- "results_allMethods_500x5_twoVar"
+result_basedir <- "results_allMethods_500x5_oneVar"
 ## result_basedir <- "results_allMethods_500x5"
-result_basedir <- "results"
+## result_basedir <- "results"
+## result_basedir <- "results"
 
 result_dirs <- list.dirs(result_basedir, full.names = TRUE, recursive = FALSE)
 ## result_dirs <- result_dirs[length(result_dirs)]
@@ -43,13 +47,15 @@ for(input_dir in result_dirs) {
 }
 res_dt <- rbindlist(result_list)
 
-res_dt[, table(embedding)]
-res_dt[, table(network)]
-res_dt[, table(method)]
-res_dt[, table(nsims)]
-## res_dt[method == "resnet_gru", table(dir_name)]
+## res_dt[, table(embedding)]
+## res_dt[, table(network)]
+## res_dt[, table(method)]
+## res_dt[, table(nsims)]
+## ## res_dt[method == "resnet_gru", table(dir_name)]
 
 truevalues_dt <- data.table(variable = c("V1", "V2"),
+                            variable_desc = c("expectation reaction parameter",
+                                              "markup reaction parameter"),
                             true_value = c(0.25, 0.001))
 res_dt <- merge(res_dt, truevalues_dt,
                 by = "variable")
@@ -58,17 +64,23 @@ res_dt <- merge(res_dt, truevalues_dt,
 p1 <- ggplot(res_dt, aes(x = value)) +
   geom_vline(aes(xintercept = true_value), linewidth = 1, colour = "lightgrey") +
   geom_density(aes(colour = method), linewidth = 1) +
-  facet_wrap(~ variable, scales = "free")
+  facet_wrap(~ variable_desc, scales = "free") +
+  theme_clean() +
+  scale_colour_ptol()
 p1
 
 p2 <- ggplot(res_dt, aes(x = value)) +
   geom_vline(aes(xintercept = true_value), linewidth = 1, colour = "lightgrey") +
   geom_density(aes(colour = embedding), linewidth = 1) +
-  facet_grid(network ~ variable, scales = "free")
+  facet_grid(network ~ variable_desc, scales = "free") +
+  theme_clean() +
+  scale_colour_ptol()
 p2
 
 p3 <- ggplot(res_dt, aes(x = value)) +
   geom_vline(aes(xintercept = true_value), linewidth = 1, colour = "lightgrey") +
   geom_density(aes(colour = network), linewidth = 1) +
-  facet_grid(embedding ~ variable, scales = "free")
+  facet_grid(embedding ~ variable_desc, scales = "free") +
+  theme_clean() +
+  scale_colour_ptol()
 p3
