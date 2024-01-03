@@ -11,21 +11,18 @@ from sbi4abm.models import BrockHommes, FrankeWesterhoff, Hopfield, MVGBM, Multi
 this_dir = os.path.dirname(os.path.realpath(__file__))
 
 class Simulator:
-
 	def __init__(self, model, T):
-
 		self.model = model
 		self.T = T
 
 	def __call__(self, pars):
-
 		x = self.model.simulate(pars=pars, T=self.T)
 		if len(x.shape) == 1:
 			x = np.expand_dims(x, axis=-1)
 		return x
 
-def _name2T(name):
 
+def _name2T(name):
 	if name[:2] == "bh":
 		T = 100
 	elif name == "fw_hpm":
@@ -40,8 +37,8 @@ def _name2T(name):
 		T = 300
 	return T
 
-def _load_simulator(task_name):
 
+def _load_simulator(task_name):
 	if task_name == "bh_noisy":
 		model = BrockHommes.Model(beta=10.)
 	elif task_name == "bh_smooth":
@@ -59,36 +56,37 @@ def _load_simulator(task_name):
 		model = MultiIndustryABM.Model()
 
 	simulator = Simulator(model, _name2T(task_name))
-
 	return simulator
 
-def _load_prior(task_name):
 
+def _load_prior(task_name):
 	if task_name == "bh_noisy":
 		prior = utils.BoxUniform(low=torch.tensor([-1.,-1.,0.,0.]),
-								 high=torch.tensor([0.,0.,1.,1.]))
+					 high=torch.tensor([0.,0.,1.,1.]))
 	elif task_name == "bh_smooth":
 		prior = utils.BoxUniform(low=torch.tensor([0.,0.,0.,-1.]),
-								 high=torch.tensor([1.,1.,1.,0.]))
+					 high=torch.tensor([1.,1.,1.,0.]))
 	elif task_name == "fw_hpm":
 		prior = utils.BoxUniform(low=torch.tensor([-1.,0.,0.,0.]),
-								 high=torch.tensor([1.,2.,20.,5.]))
+					 high=torch.tensor([1.,2.,20.,5.]))
 	elif task_name == "fw_wp":
 		prior = utils.BoxUniform(low= torch.tensor([0.,0.,0.]),
-								 high=torch.tensor([1.,1.,1.]))
+					 high=torch.tensor([1.,1.,1.]))
 	elif task_name == "hop":
 		prior = utils.BoxUniform(low=torch.tensor([0.,0.,0.]),
-								 high=torch.tensor([5.,1.,1.]))
+					 high=torch.tensor([5.,1.,1.]))
 	elif task_name == "mvgbm":
 		prior = utils.BoxUniform(low=torch.tensor([-1.,-1.,-1.]),
-								 high=torch.tensor([1., 1., 1.]))
+					 high=torch.tensor([1., 1., 1.]))
 	elif task_name == "MultiIndustryABM":
-		prior = utils.BoxUniform(low=torch.tensor([0., 0., 0., 1., 1., 0.]),
-					 high=torch.tensor([1., 0.01, 1., 5., 2., 1.]))
+		prior = utils.BoxUniform(low=torch.tensor([0., 0.]),
+					 high=torch.tensor([1., 0.01]))
+		# prior = utils.BoxUniform(low=torch.tensor([0., 0., 0., 1., 1., 0.]),
+		# 			 high=torch.tensor([1., 0.01, 1., 5., 2., 1.]))
 	return prior
 
-def _load_dataset(task_name):
 
+def _load_dataset(task_name):
 	if task_name == "bh_noisy":
 		y = np.loadtxt(os.path.join(this_dir, "../data/BH_Noisy/obs.txt"))
 	elif task_name == "bh_smooth":
@@ -106,8 +104,8 @@ def _load_dataset(task_name):
 		y = np.loadtxt(os.path.join(this_dir, "../data/MultiIndustryABM/obs.txt"))##[0:]
 	return y
 
-def _load_true_pars(task_name):
 
+def _load_true_pars(task_name):
 	if task_name == "bh_noisy":
 		theta = np.array([-0.7,-0.4,0.5,0.3])
 	elif task_name == "bh_smooth":
@@ -125,16 +123,16 @@ def _load_true_pars(task_name):
 		theta = np.array([0.25, 0.001])
 	return theta
 
-def load_task(task_name):
 
+def load_task(task_name):
 	simulator = _load_simulator(task_name)
 	prior = _load_prior(task_name)
 	y = _load_dataset(task_name)
 	start = _load_true_pars(task_name)
 	return simulator, prior, y, start
 
-def prep_outloc(args):
 
+def prep_outloc(args):
 	# Ensure directory exists -- throw error if not
 	if os.path.exists(args.outloc):
 		# If directory exists, create a subdirectory with name = timestamp
@@ -153,11 +151,10 @@ def prep_outloc(args):
 				fh.write("{0} {1}\n".format(arg, getattr(args, arg)))
 	else:
 		raise ValueError("Output location doesn't exist -- please create the folder")
-
 	return outloc
 
-def save_output(posteriors, samples, ranks, outloc):
 
+def save_output(posteriors, samples, ranks, outloc):
 	if not posteriors is None:
 		loc = os.path.join(outloc, "posteriors.pkl")
 		with open(loc, "wb") as fh:
