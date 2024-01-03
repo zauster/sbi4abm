@@ -36,15 +36,22 @@ class Model:
 
 
         def simulate(self, pars = None, T = 100, seed = None):
-                time.sleep(random.uniform(0.1, 0.5))
+                time.sleep(random.uniform(0.01, 0.05))
                 params = np.array([float(pars[i]) for i in range(len(pars))])
-                self.config["expectation_react_param"] = float(params[0]) ## 0.25
-                self.config["markup_react_param"] = float(params[1]) ## 0.001
-                self.config["desired_inventory_ratio"] = float(params[2]) ## 0.05
-                self.config["desired_intermediate_inputs_inventory_factor"] = float(params[3]) ## 3
-                self.config["financial_needs_buffer_factor"] = float(params[4]) ## 1.2
-                self.config["unemployment_wage_revision_threshold"] = float(params[5]) ## 0.08
-                # self.config["budget_react_param"] = float(params[6]) ## 0.1
+                if len(params) >= 1:
+                        self.config["expectation_react_param"] = float(params[0]) ## 0.25
+                if len(params) >= 2:
+                        self.config["markup_react_param"] = float(params[1]) ## 0.001
+                if len(params) >= 3:
+                        self.config["desired_inventory_ratio"] = float(params[2]) ## 0.05
+                if len(params) >= 4:
+                        self.config["desired_intermediate_inputs_inventory_factor"] = float(params[3]) ## 3
+                if len(params) >= 5:
+                        self.config["financial_needs_buffer_factor"] = float(params[4]) ## 1.2
+                if len(params) >= 6:
+                        self.config["unemployment_wage_revision_threshold"] = float(params[5]) ## 0.08
+                        # if len(params) >= 7:
+                        # self.config["budget_react_param"] = float(params[6]) ## 0.1
 
                 ## copy xlsx file to a random filename
                 xlsx_filename = "".join(["sbi4abm_configs/", "".join(random.choices(string.ascii_lowercase, k = 6)), ".xlsx"])
