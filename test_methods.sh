@@ -7,7 +7,7 @@ output_dir=${2:-"results"}
 
 # nsf does not work
 
-for network in maf mdn made resnet mlp
+for network in maf mdn made resnet
 # for network in mlp
 do
     for embedding in gru elman

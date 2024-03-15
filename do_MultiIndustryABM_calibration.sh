@@ -37,13 +37,13 @@
 
 echo "=> Running the sbi4abm algorithm"
 python sbi4abm/utils/job_script.py \
-    --task MultiIndustryABM \
-    --method maf_gru \
-    --outloc results \
-    --nsims 500x10 \
-    --nw 10
+    --task=MultiIndustryABM \
+    --method=maf_gru \
+    --outloc=results \
+    --nsims=200x5 \
+    --nw=5
 
 
 # --method resnet_gru \ ## seems to work fine
 
-cat /tmp/kill_jc_crashed.pid | xargs kill
+# cat /tmp/kill_jc_crashed.pid | xargs kill
