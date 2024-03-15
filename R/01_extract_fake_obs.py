@@ -22,12 +22,14 @@ res_dt = pd.read_parquet(os.path.join(base_path,
 									  "Model.parquet"),
 						 columns = ["period",
 									"real_GDP_growth",
-									"real_GDP__primary",
-									"real_GDP__manufacturing",
-									"real_GDP__energy",
-									"real_GDP__services",
+									"real_GDP_growth__primary",
+									"real_GDP_growth__manufacturing",
+									"real_GDP_growth__energy",
+									"real_GDP_growth__construction",
+									"real_GDP_growth__services",
 									"inflation_rate",
-									"unemployment_rate"])
+									"unemployment_rate"]
+						 )
 
 # [19] "aggregate_demand_final_goods__energy"
 # [20] "aggregate_demand_final_goods__manufacturing"
