@@ -41,7 +41,7 @@ python sbi4abm/utils/job_script.py \
     --method=maf_gru \
     --outloc=results \
     --nsims=200x5 \
-    --nw=5
+    --nw=10
 
 
 # --method resnet_gru \ ## seems to work fine

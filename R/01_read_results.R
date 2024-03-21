@@ -6,10 +6,10 @@ library(ggplot2)
 library(ggthemes)
 
 
-result_basedir <- "results_allMethods_500x5_oneVar"
+## result_basedir <- "results_allMethods_500x5_oneVar"
 ## result_basedir <- "results_allMethods_500x5_twoVar"
 ## result_basedir <- "results_allMethods_500x5"
-## result_basedir <- "results"
+result_basedir <- "results"
 
 result_dirs <- list.dirs(result_basedir, full.names = TRUE, recursive = FALSE)
 ## result_dirs <- result_dirs[length(result_dirs)]
@@ -47,10 +47,16 @@ for(input_dir in result_dirs) {
 }
 res_dt <- rbindlist(result_list)
 
-truevalues_dt <- data.table(variable = c("V1", "V2"),
+truevalues_dt <- data.table(variable = paste0("V", 1:8),
                             variable_desc = c("expectation reaction parameter",
-                                              "markup reaction parameter"),
-                            true_value = c(0.25, 0.001))
+                                              "desired_intermediate_inputs_inventory_factor",
+                                              "desired_real_output_inventory_ratio",
+                                              "inflation_adj_parameter",
+                                              "financial_needs_buffer_factor",
+                                              "markup_reaction_parameter",
+                                              "firm_order_market_weighting_parameter",
+                                              "job_search_probability_employed"),
+                            true_value = c(0.1, 3, 0.1, 0.75, 1.2, 0.01, 0.66, 0.1))
 res_dt <- merge(res_dt, truevalues_dt,
                 by = "variable")
 
@@ -96,7 +102,7 @@ p_gru <- ggplot(res_dt[embedding == "gru", ], aes(x = value)) +
   theme_clean() +
   theme(strip.text = element_text(size = 15)) +
   scale_colour_ptol("Network")
-## p_gru
+p_gru
 
 ggsave(plot = p_gru, width = 10, height = 6,
        filename = paste0("plots/", result_basedir, "_gru_hist.png"))

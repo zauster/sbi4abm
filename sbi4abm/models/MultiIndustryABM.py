@@ -22,13 +22,13 @@ class Model:
                 ## for these simulations, the aggregate output is enough
                 self.config["save_output"] = "aggregates"
                 ## set the number of periods
-                self.config["n_periods"] = 10
+                self.config["n_periods"] = 100
                 self.config["check_sfc_consistency"] = False
 
                 self.experiment_dir = "sbi4abm_results"
                 # self.experiment_dir = "test"
                 self.empirical_parameters_file = self.config["empirical_parameters_file"]
-                self.parameters_to_calibrate = ["expectation_react_param",
+                self.parameters_to_calibrate = ["expectation_reaction_parameter",
                                                 "desired_intermediate_inputs_inventory_factor",
                                                 "desired_real_output_inventory_ratio",
                                                 "inflation_adj_parameter",
@@ -39,23 +39,23 @@ class Model:
 
 
         def simulate(self, pars = None, T = 100, seed = None):
-                print("--> Starting new simulation ...")
+                # print("--> Starting new simulation ...")
                 time.sleep(random.uniform(0.01, 0.5))
                 params = np.array([float(pars[i]) for i in range(len(pars))])
 
-                # counter = 0
-                # for param in self.parameters_to_calibrate:
-                #         self.config[param] = float(params[counter])
-                #         counter += 1
+                counter = 0
+                for param in self.parameters_to_calibrate:
+                        self.config[param] = float(params[counter])
+                        counter += 1
 
-                self.config["expectation_react_param"] = float(params[0]) ## 0.1
-                self.config["desired_intermediate_inputs_inventory_factor"] = float(params[1]) ## 3
-                self.config["desired_real_output_inventory_ratio"] = float(params[2]) ## 0.1
-                self.config["inflation_adj_parameter"] = float(params[3]) ## 0.75
-                self.config["financial_needs_buffer_factor"] = float(params[4]) ## 1.2
-                self.config["markup_reaction_parameter"] = float(params[5]) ## 0.01
-                self.config["firm_order_market_weighting_parameter"] = float(params[6]) ## 0.66
-                self.config["job_search_probability_employed"] = float(params[7]) ## 0.1
+                # self.config["expectation_react_param"] = float(params[0]) ## 0.1
+                # self.config["desired_intermediate_inputs_inventory_factor"] = float(params[1]) ## 3
+                # self.config["desired_real_output_inventory_ratio"] = float(params[2]) ## 0.1
+                # self.config["inflation_adj_parameter"] = float(params[3]) ## 0.75
+                # self.config["financial_needs_buffer_factor"] = float(params[4]) ## 1.2
+                # self.config["markup_reaction_parameter"] = float(params[5]) ## 0.01
+                # self.config["firm_order_market_weighting_parameter"] = float(params[6]) ## 0.66
+                # self.config["job_search_probability_employed"] = float(params[7]) ## 0.1
 
                 ## copy xlsx file to a random filename
                 # print("  Copying excel file ...")
@@ -71,7 +71,7 @@ class Model:
                         ## update the config with the parameter determined by the NN and write
                         ## it to file
                         simulation_number = str(time.time()).replace(".", "")
-                        print(" --> ", simulation_number, ": writing toml")
+                        # print(" --> ", simulation_number, ": writing toml")
                         tested_random_numbers.append(simulation_number)
                         tmpfilename = os.path.join(self.model_path,
                                                    "sbi4abm_configs",
@@ -104,7 +104,7 @@ class Model:
                         #                 break
 
                         cmd_call = " ".join(cmd_call_list)
-                        print(" --> ", simulation_number, ": Dispatching process", cmd_call)
+                        # print(" --> ", simulation_number, ": Dispatching process", cmd_call)
                         returncode = subprocess.call(cmd_call, shell = True)
                         # returncode = subprocess.call(cmd_call_list, shell = False)
 
