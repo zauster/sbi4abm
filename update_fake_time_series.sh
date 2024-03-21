@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 echo "=> Producing fake time series"
-juliaclient \
+julia \
     --project=/mnt/extData3/2023_OeNB_GeneticOptimisation_ABM/Calibration \
     /mnt/extData3/2023_OeNB_GeneticOptimisation_ABM/Calibration/src/run_one_simulation.jl \
     --config_file=/mnt/extData3/2023_OeNB_GeneticOptimisation_ABM/models/MultiIndustry_ABM/model_config_5industries.toml \
