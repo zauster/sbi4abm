@@ -19,11 +19,12 @@ class Model:
 
                 self.config = toml.load(os.path.join(self.model_path,
                                                      "model_config_5industries.toml"))
+
                 ## for these simulations, the aggregate output is enough
                 self.config["save_output"] = "aggregates"
+                self.config["check_sfc_consistency"] = False
                 ## set the number of periods
                 self.config["n_periods"] = 100
-                self.config["check_sfc_consistency"] = False
 
                 self.experiment_dir = "sbi4abm_results"
                 # self.experiment_dir = "test"
@@ -50,7 +51,7 @@ class Model:
 
                 # self.config["expectation_react_param"] = float(params[0]) ## 0.1
                 # self.config["desired_intermediate_inputs_inventory_factor"] = float(params[1]) ## 3
-                # self.config["desired_real_output_inventory_ratio"] = float(params[2]) ## 0.1
+                # self.config["desired_real_output_inventory_ratio"] = float(params[2]) ## 0.5
                 # self.config["inflation_adj_parameter"] = float(params[3]) ## 0.75
                 # self.config["financial_needs_buffer_factor"] = float(params[4]) ## 1.2
                 # self.config["markup_reaction_parameter"] = float(params[5]) ## 0.01
@@ -82,6 +83,7 @@ class Model:
 
                         ## start simulation, get output directory
                         cmd_call_list = [
+                                "GKSwstype=nul", ## for plotting to work
                                 # "juliaclient",
                                 "julia",
                                 f"--project={self.calibration_path}",
@@ -115,7 +117,7 @@ class Model:
                                                                       self.experiment_dir,
                                                                       "sim_" + str(simulation_number),
                                                                       "data",
-                                                                      "Model.parquet"),
+                                                                      "model.parquet"),
                                                          columns = ["period",
                                                                     "real_GDP_growth",
                                                                     "real_GDP_growth__primary",
