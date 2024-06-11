@@ -1,27 +1,29 @@
 #!/usr/bin/env sh
 set -u
-nsims=${1:-"500x5"}
-output_dir=${2:-"results"}
+nsims=${1:-"500x3"}
+nworker=${2:-10}
+output_dir=${3:-"results"}
 
-./kill_jc_crashed.sh > kill_jc.log &
+#./kill_jc_crashed.sh > kill_jc.log &
+# source venv_sbi4abm/bin/activate
 
-# nsf does not work
+# mlp, nsf do not work
+# embedding=elman did not produce good results
 
-for network in maf mdn made resnet
-# for network in mlp
+# for network in maf made resnet mlp
+for network in maf made
 do
-    for embedding in gru elman
+    for embedding in gru
     do
-        echo "\n=> Testing ${network}_${embedding}"
+        echo -e "\n=> Testing ${network}_${embedding}"
         python sbi4abm/utils/job_script.py \
             --task MultiIndustryABM \
             --method ${network}_${embedding} \
             --outloc ${output_dir} \
             --nsims ${nsims} \
-            --nw 10
+            --nw ${nworker}
     done
 done
 
-# --task mvgbm \
-
-cat /tmp/kill_jc_crashed.pid | xargs kill
+# cat /tmp/kill_jc_crashed.pid | xargs kill
+# deactivate
