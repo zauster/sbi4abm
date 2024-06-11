@@ -7,26 +7,31 @@ In this repository, we provide code that builds on the [`sbi` package](https://g
 ## Papers
 The code in this repository has been used in the following two papers:
 
-[**Black-box Bayesian inference for economic agent-based models**](https://arxiv.org/abs/2202.00625)\
+[**Black-box Bayesian inference for agent-based models**](https://www.sciencedirect.com/science/article/pii/S0165188924000198)\
 _Dyer, J.; Cannon, P.; Farmer, J. D.; Schmon, S. M._\
-arXiv:2202.00625 (2022)\
+Journal of Economic Dynamics and Control (2024)\
 [45-minute talk on this paper on INET Oxford YouTube](https://www.youtube.com/watch?v=yVNE8focE30)
 
 and
 
 [**Calibrating agent-based models to microdata with graph neural networks**](https://openreview.net/pdf?id=ZWyHGTUcgJD)\
 _Dyer, J.; Cannon, P.; Farmer, J. D.; Schmon, S. M._\
-Soptlight Paper at the ICML 2022 Workshop on AI for Agent-based Modelling (2022)\
+Soptlight Paper and Best Short Paper at the ICML 2022 Workshop on AI for Agent-based Modelling (2022)\
 [5-minute video from the ICML 2022 AI4ABM Workshop](https://slideslive.com/38985937)
 
 These papers can be cited using the following citation info:
 
 ```
-@article{dyer2022black,
-  title={{Black-box Bayesian inference for economic agent-based models}},
-  author={Dyer, Joel and Cannon, Patrick and Farmer, J Doyne and Schmon, Sebastian},
-  journal={arXiv preprint arXiv:2202.00625},
-  year={2022}
+@article{DYER2024104827,
+title = {Black-box Bayesian inference for agent-based models},
+journal = {Journal of Economic Dynamics and Control},
+volume = {161},
+pages = {104827},
+year = {2024},
+issn = {0165-1889},
+doi = {https://doi.org/10.1016/j.jedc.2024.104827},
+url = {https://www.sciencedirect.com/science/article/pii/S0165188924000198},
+author = {Joel Dyer and Patrick Cannon and J. Doyne Farmer and Sebastian M. Schmon}
 }
 ```
 and
