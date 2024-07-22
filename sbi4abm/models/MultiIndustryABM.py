@@ -15,7 +15,9 @@ class Model:
                 self.base_path = "/mnt/extData3/2023_OeNB_GeneticOptimisation_ABM/"
                 self.model_path = os.path.join(self.base_path, "models", "MultiIndustry_ABM")
                 self.calibration_path = os.path.join(self.base_path, "Calibration")
-                self.sock_file = "/run/user/1000/julia-daemon/conductor.sock"
+                # self.sock_file = "/run/user/1000/julia-daemon/conductor.sock"
+                self.starting_period = 11
+                self.timeseries_length = 112
 
                 self.config = toml.load(os.path.join(self.model_path,
                                                      "model_config_5industries.toml"))
@@ -24,14 +26,12 @@ class Model:
                 self.config["save_output"] = "aggregates"
                 self.config["check_sfc_consistency"] = False
                 ## set the number of periods
-                self.config["n_periods"] = 100
+                self.config["n_periods"] = self.starting_period + self.timeseries_length
 
                 self.experiment_dir = "sbi4abm_results"
                 # self.experiment_dir = "test"
                 self.empirical_parameters_file = self.config["empirical_parameters_file"]
                 self.parameters_to_calibrate = ["expectation_reaction_parameter",
-                                                "desired_intermediate_inputs_inventory_factor",
-                                                "desired_real_output_inventory_ratio",
                                                 "inflation_adj_parameter",
                                                 "financial_needs_buffer_factor",
                                                 "markup_reaction_parameter",
@@ -48,15 +48,6 @@ class Model:
                 for param in self.parameters_to_calibrate:
                         self.config[param] = float(params[counter])
                         counter += 1
-
-                # self.config["expectation_react_param"] = float(params[0]) ## 0.1
-                # self.config["desired_intermediate_inputs_inventory_factor"] = float(params[1]) ## 3
-                # self.config["desired_real_output_inventory_ratio"] = float(params[2]) ## 0.5
-                # self.config["inflation_adj_parameter"] = float(params[3]) ## 0.75
-                # self.config["financial_needs_buffer_factor"] = float(params[4]) ## 1.2
-                # self.config["markup_reaction_parameter"] = float(params[5]) ## 0.01
-                # self.config["firm_order_market_weighting_parameter"] = float(params[6]) ## 0.66
-                # self.config["job_search_probability_employed"] = float(params[7]) ## 0.1
 
                 ## copy xlsx file to a random filename
                 # print("  Copying excel file ...")
@@ -126,18 +117,26 @@ class Model:
                                                                     "real_GDP_growth__construction",
                                                                     "real_GDP_growth__services",
                                                                     "inflation_rate",
-                                                                    "unemployment_rate"],
+                                                                    "unemployment_rate", ##,
+                                                                    # "final_consumption_growth__government":
+                                                                    "aggregate_real_public_consumption_expenditure_growth",
+                                                                    # "final_consumption_growth__households":
+                                                                    "aggregate_real_private_consumption_expenditure_growth",
+                                                                    "real_GDP_growth__capital" # == "gross_fixed_capital_formation_growth"
+                                                                    ],
                                                          ## pyarrow does not work when called in parallel processes
                                                          engine = "fastparquet")
-                                res_dt = res_dt[res_dt["period"] >= 1].drop(columns = ["period"])
+                                res_dt = res_dt[res_dt["period"] >= self.starting_period].drop(columns = ["period"])
                                 res_array = res_dt.to_numpy()
                                 # print("[Simulate] Res array: ", res_array.shape)
                                 # res_array = np.zeros((100, 2))
                                 break
                         elif len(tested_random_numbers) >= 5:
-                                print("  => Simulation failed!")
-                                print("     Tested random numbers: ", tested_random_numbers)
-                                raise Exception("Maximum number of retries: Simulation did not terminate successfully!")
+                                msg =  "  => Simulation failed!\n"
+                                msg += "     Tested random numbers: "
+                                msg += ", ".join(map(str, tested_random_numbers))
+                                msg += "\n\nMaximum number of retries: Simulation did not terminate successfully!"
+                                raise Exception(msg)
                         else:
                                 continue ## do another test with a different random seed
 

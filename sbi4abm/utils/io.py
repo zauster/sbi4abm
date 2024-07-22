@@ -79,8 +79,8 @@ def _load_prior(task_name):
 		prior = utils.BoxUniform(low=torch.tensor([-1.,-1.,-1.]),
 					 high=torch.tensor([1., 1., 1.]))
 	elif task_name == "MultiIndustryABM":
-		prior = utils.BoxUniform(low=torch.tensor([0., 1., 0., 0., 1., 0.0001, 0., 0.]),
-					 high=torch.tensor([0.5, 5., 1.5, 1., 2., 0.05, 1., 0.4]))
+		prior = utils.BoxUniform(low=torch.tensor([0., 0., 1., 0.0001, 0., 0.]),
+					 high=torch.tensor([0.5, 1., 2., 0.05, 1., 0.4]))
 	return prior
 
 
@@ -97,9 +97,11 @@ def _load_dataset(task_name):
 		y = np.load(os.path.join(this_dir, "../data/Hopfield/small_graph_correct.npy"))
 	elif task_name == "mvgbm":
 		y = np.loadtxt(os.path.join(this_dir, "../data/MVGBM/obs.txt"))[1:]
-		# print("MVGBM input: ", y)
 	elif task_name == "MultiIndustryABM":
-		y = np.loadtxt(os.path.join(this_dir, "../data/MultiIndustryABM/obs.txt"))##[0:]
+		print(" ==> MultiIndustryABM using ARTIFICIAL time series")
+		y = np.loadtxt(os.path.join(this_dir, "../data/MultiIndustryABM/artificial_timeseries.txt"))##[0:]
+		# print(" ==> MultiIndustryABM using EMPIRICAL time series")
+		# y = np.loadtxt(os.path.join(this_dir, "../data/MultiIndustryABM/empirical_timeseries.txt"))##[0:]
 	return y
 
 
@@ -118,7 +120,10 @@ def _load_true_pars(task_name):
 		theta = np.array([0.2,-0.5,0.])
 	elif task_name == "MultiIndustryABM":
 		# theta = np.array([0.25])
-		theta = np.array([0.1, 3.0, 0.1, 0.75, 1.2, 0.01, 0.66, 0.1])
+		# theta = np.array([0.1, 0.75, 1.1, 0.005, 0.33, 0.1])
+		theta = None
+	else:
+		theta = None
 	return theta
 
 
