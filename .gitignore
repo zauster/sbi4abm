@@ -6,3 +6,9 @@ samples.txt
 /sbi4abm/*/__pycache__/
 /sbi4abm/*/*/__pycache__/
 /sbi4abm/*/*/*/__pycache__/
+results_*/
+/sbi-logs/
+/sbi4abm.egg-info/
+/sbi4abm/__pycache__/
+*.log
+/log_calibration
