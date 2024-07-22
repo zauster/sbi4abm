@@ -44,30 +44,30 @@ def create_density_estimator(embedding_kwargs, density_estimator):
 	# Then just use default settings (since these are from benchmarking paper)
 	if density_estimator in ["maf", "nsf", "made", "mdn"]:
 		density_estimator = utils.posterior_nn(model=density_estimator,
-											   embedding_net=embedding_net,
-											   z_score_x=z_score_x)
+						       embedding_net=embedding_net,
+						       z_score_x=z_score_x)
 	# Else it's a ratio estimator (classifier), so just use default settings again
 	elif density_estimator in ["linear", "mlp", "resnet"]:
 		density_estimator = utils.get_nn_models.classifier_nn(density_estimator,
-															  embedding_net_x=embedding_net,
-															  z_score_x=z_score_x)
+								      embedding_net_x=embedding_net,
+								      z_score_x=z_score_x)
 	return density_estimator, z_score_x
 
 
 def sbi_training(simulator,
-				 prior,
-				 y,
-				 method,
-				 density_estimator,
-				 n_samples=10_000,
-				 n_sims=[10_000], 
-				 sim_postprocess=lambda x: x,
-				 sampler=None,
-				 start=None,
-				 scale=None,
-				 num_workers=15,
-				 z_score_x=True,
-				 outloc=None):
+		 prior,
+		 y,
+		 method,
+		 density_estimator,
+		 n_samples=10_000,
+		 n_sims=[10_000],
+		 sim_postprocess=lambda x: x,
+		 sampler=None,
+		 start=None,
+		 scale=None,
+		 num_workers=15,
+		 z_score_x=True,
+		 outloc=None):
 
 	sbi_simulator, sbi_prior = prepare_for_sbi(simulator, prior)
 	posteriors = []
@@ -111,12 +111,14 @@ def sbi_training(simulator,
 			if scale is None:
 				scale = 2/np.sqrt(_start.size)
 			trial_samples = sampling.mh(proposal.log_prob, _start, n_samples=N_TRIAL_SAMPLES,
-								  scale=scale, to_torch=True)
+						    scale=scale, to_torch=True)
+			## OR: cov is not symmetric positive definite...
 			cov = np.cov(trial_samples.T)
 			if start is None:
 				start = np.mean(trial_samples[::50], axis=0)
-			samples = sampling.mh(proposal.log_prob, start, n_samples=n_samples,
-								  cov=cov, scale=scale, to_torch=True)
+			samples = sampling.mh(proposal.log_prob, start,
+					      n_samples = n_samples,
+					      cov=cov, scale = scale, to_torch = True)
 		elif sampler == "sir":
 			prior_samples = prior.sample((20*n_samples,))
 			weights = np.exp(proposal.log_prob(prior_samples).numpy()

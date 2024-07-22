@@ -14,7 +14,7 @@ def _parse_nsims(nsims):
 
 	"""
 	Allows nsims in either format of list, in which case interpreted as list
-	of simulations at each round, or of string 
+	of simulations at each round, or of string
 	"""
 
 	if len(nsims) == 1:
@@ -233,24 +233,24 @@ if __name__ == "__main__":
 									 formatter_class=RawTextHelpFormatter)
 	# TODO: create list of tasks to be run and include in description
 	parser.add_argument('--task', type=str,
-						help=("Name of inference task to run. " + 
+						help=("Name of inference task to run. " +
 							  "Current choices are:\n- bh_noisy\n- bh_smooth"+
 							  "\n- fw_hpm\n- hop\n- mvgbm"))
 	# TODO: create list of inference methods that can be called and include in
 	# description. Maybe any of the density estimation methods compatible with
 	# the sbi package, meaning that method with a GRU embedding net, or
-	# additionally followed by _s if they are to be used with fixed, naive 
+	# additionally followed by _s if they are to be used with fixed, naive
 	# summary statistics instead
 	parser.add_argument('--method', type=str,
-						help=("Name of density estimator/classifier. Suffix " + 
-							  "'_s' indicates that no embedding net is " + 
+						help=("Name of density estimator/classifier. Suffix " +
+							  "'_s' indicates that no embedding net is " +
 							  "to be used."))
 	parser.add_argument('--nsims', type=str, nargs='+',
 						help=("Number of simulations to run, e.g. 1000 1000" +
 							  " 2000 indicates 3 rounds with 1000 in first " +
 							  "two and 2000 in third. Alternatively, write " +
 							  "<nsim>x<nround> to ask for nround rounds of " +
-							  "nsim simulations, e.g. 1000x10 asks for 10 " + 
+							  "nsim simulations, e.g. 1000x10 asks for 10 " +
 							  "rounds of 1000 simulation each."))
 	parser.add_argument('--outloc', type=str,
 						help="Location to dump inference results.")
@@ -263,7 +263,7 @@ if __name__ == "__main__":
 	parser.add_argument('--sbc', action='store_true', default=False,
 						help="If included, simulation-based calibration is performed")
 	parser.add_argument('--sampler', type=str, default='mh',
-						help=("Which sampling method to use for (S)NRE for the " + 
+						help=("Which sampling method to use for (S)NRE for the " +
 							  "final posterior samples. ['sir', 'mh']"))
 	parser.add_argument('--load_post', type=str, nargs="?", default="",
 						help="Location to load an pretrained posterior from")
@@ -295,23 +295,23 @@ if __name__ == "__main__":
 		simulator, y = _kde_prepare_simulator_observation(simulator, args, y)
 
 		posteriors, samples = kde.kde_training(simulator,
-											   prior,
-											   y,
-											   start=true_theta,
-											   scale=args.scale,
-											   n_sims=nsims,
-											   R=args.R)
+						       prior,
+						       y,
+						       start=true_theta,
+						       scale=args.scale,
+						       n_sims=nsims,
+						       R=args.R)
 		if args.sbc:
 			# TODO: write this script
 			N_SAMPLES_PER_ITER = 10*N_BINS
 			ranks = sbc.p_kde_sbc_script(simulator,
-										 prior,
-										 N_RANK_COMPUTATIONS,
-										 N_BINS,
-										 N_SAMPLES_PER_ITER,
-										 scale=args.scale,
-										 R=args.R,
-										 n_jobs=60)
+						     prior,
+						     N_RANK_COMPUTATIONS,
+						     N_BINS,
+						     N_SAMPLES_PER_ITER,
+						     scale=args.scale,
+						     R=args.R,
+						     n_jobs=60)
 
 	##################
 	# NEURAL METHODS #
@@ -319,10 +319,10 @@ if __name__ == "__main__":
 	else:
 		if args.sbc and isinstance(nsims, list):
 			if len(nsims) > 1:
-				error_msg = ("Currently no implementation of SBC with " + 
-							 "non-amortised density (ratio) estimators " + 
-							 "exists; consider resubmitting this job with " +
-							 "one training round")
+				error_msg = ("Currently no implementation of SBC with " +
+					     "non-amortised density (ratio) estimators " +
+					     "exists; consider resubmitting this job with " +
+					     "one training round")
 				raise NotImplementedError(error_msg)
 
 		#sim_pp = _get_postprocessor(args)
@@ -342,19 +342,19 @@ if __name__ == "__main__":
 			sampler = args.sampler
 		if len(args.load_post) == 0:
 			posteriors, samples = neural.sbi_training(simulator,
-													  prior,
-													  y,
-													  sbi_method,
-													  density_estimator, 
-													  n_samples=N_SAMPLES,
-													  n_sims=nsims,
-													  sim_postprocess=sim_pp,
-													  start=true_theta,
-													  scale=args.scale,
-													  sampler=sampler,
-													  num_workers=args.nw,
-													  z_score_x=z_score_x,
-													  outloc=outloc)
+								  prior,
+								  y,
+								  sbi_method,
+								  density_estimator,
+								  n_samples=N_SAMPLES,
+								  n_sims=nsims,
+								  sim_postprocess=sim_pp,
+								  start=true_theta,
+								  scale=args.scale,
+								  sampler=sampler,
+								  num_workers=args.nw,
+								  z_score_x=z_score_x,
+								  outloc=outloc)
 			io.save_output(posteriors, samples, ranks, outloc)
 		else:
 			with open(args.load_post, "rb") as fh:
@@ -362,22 +362,22 @@ if __name__ == "__main__":
 			samples = None
 		if args.sbc:
 			if sbi_method == "SNPE":
-				N_SAMPLES_PER_ITER = 2*(N_BINS - 1) 
+				N_SAMPLES_PER_ITER = 2*(N_BINS - 1)
 				ranks = sbc.npe_sbc_script(posteriors[-1],
-										   simulator,
-										   prior,
-										   N_RANK_COMPUTATIONS,
-										   N_BINS,
-										   N_SAMPLES_PER_ITER)
-			elif sbi_method == "SNRE": 
+							   simulator,
+							   prior,
+							   N_RANK_COMPUTATIONS,
+							   N_BINS,
+							   N_SAMPLES_PER_ITER)
+			elif sbi_method == "SNRE":
 				N_SAMPLES_PER_ITER = 100*N_BINS
 				ranks = sbc.p_nre_sbc_script(posteriors[-1],
-										   simulator,
-										   prior,
-										   N_RANK_COMPUTATIONS,
-										   N_BINS,
-										   N_SAMPLES_PER_ITER,
-										   scale=args.scale,
-										   n_jobs=2)
-	
+							     simulator,
+							     prior,
+							     N_RANK_COMPUTATIONS,
+							     N_BINS,
+							     N_SAMPLES_PER_ITER,
+							     scale=args.scale,
+							     n_jobs=2)
+
 	io.save_output(posteriors, samples, ranks, outloc)

@@ -27,7 +27,7 @@ class MCABC(ABCBASE):
 
         Args:
             simulator: A function that takes parameters $\theta$ and maps them to
-                simulations, or observations, `x`, $\mathrm{sim}(\theta)\to x$. Any
+                simulations, or observations, `x`, $\\mathrm{sim}(\theta)\to x$. Any
                 regular Python callable (i.e. function or class with `__call__` method)
                 can be used.
             prior: A probability distribution that expresses prior knowledge about the
