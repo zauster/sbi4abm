@@ -14,7 +14,8 @@ REQUIRED = [
     "scipy",
     "tensorboard",
     "torch>=1.8.0",
-    "torch_geometric==2.3",
+    # "torch_geometric==2.3",
+    "torch_geometric",
     "torch-geometric-temporal",
     "tqdm",
 ]
