@@ -4,7 +4,7 @@ suppressMessages(library(here))
 setwd(here::here())
 library(ggplot2)
 library(ggthemes)
-
+library(configr)
 
 ## result_basedir <- "results_methods_500x3_8var"
 ## result_basedir <- "results_allMethods_500x5_twoVar"
@@ -41,7 +41,7 @@ for(input_dir in result_dirs) {
   ## ... and save
   result_list[[input_dir]] = tmp_full
   } else {
-    warning("=> Sample file does not exist: ", input_dir)
+    warning("=> Sample file does not exist: ignoring directory ", input_dir)
   }
 }
 
@@ -52,16 +52,19 @@ res_dt <- rbindlist(result_list)
 ##                                               "markup reaction parameter"),
 ##                             true_value = c(0.25, 0.001))
 
-truevalues_dt <- data.table(variable = paste0("V", 1:8),
-                            variable_desc = c("expectation reaction parameter",
-                                              "desired_intermediate_inputs_inventory_factor",
-                                              "desired_real_output_inventory_ratio",
+true_toml_config <- file.path("/mnt/extData3/2023_OeNB_GeneticOptimisation_ABM/models/MultiIndustry_ABM/model_config_5industries.toml")
+truevalues_toml <- read.config(true_toml_config)
+
+truevalues_dt <- data.table(variable = paste0("V", 1:6),
+                            variable_desc = c("expectation_reaction_parameter",
                                               "inflation_adj_parameter",
                                               "financial_needs_buffer_factor",
                                               "markup_reaction_parameter",
                                               "firm_order_market_weighting_parameter",
                                               "job_search_probability_employed"),
-                            true_value = c(0.1, 2.0, 0.1, 0.75, 1.2, 0.01, 0.33, 0.1))
+                            true_value = c(0.1, 0.75, 1.1, 0.005, 0.33, 0.1))
+
+## truevalues_toml[truevalues_dt$variable_desc]
 
 res_dt <- merge(res_dt, truevalues_dt,
                 by = "variable")
@@ -77,9 +80,9 @@ p1 <- ggplot(res_dt, aes(x = value)) +
   xlab("") + ylab("") +
   theme_clean() +
   scale_colour_ptol()
-## p1
-ggsave(plot = p1, height = plot_width, width = plot_height,
-       filename = paste0("plots/", result_basedir, "_hist1.png"))
+p1
+## ggsave(plot = p1, height = plot_width, width = plot_height,
+##        filename = paste0("plots/", result_basedir, "_hist1.png"))
 
 ## p_gru <- ggplot(res_dt[embedding == "gru", ], aes(x = value)) +
 ##   geom_vline(aes(xintercept = true_value), linewidth = 1, colour = "lightgrey") +
