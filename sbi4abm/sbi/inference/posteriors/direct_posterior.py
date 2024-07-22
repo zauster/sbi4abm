@@ -542,7 +542,7 @@ class DirectPosterior(NeuralPosterior):
 
         Returns:
             log_prob: `(len(θ),)`-shaped normalized (!) log posterior probability
-                $\log p(\theta|x) for θ in the support of the prior, -∞ (corresponding
+                $\\log p(\theta|x) for θ in the support of the prior, -∞ (corresponding
                 to 0 probability) outside.
         """
 
@@ -695,8 +695,7 @@ class PotentialFunctionProvider:
     def posterior_potential(
         self, theta: Union[Tensor, np.array], track_gradients: bool = False
     ) -> Tensor:
-        """
-        Return posterior theta log prob. $p(\theta|x)$, $-\infty$ if outside prior.
+        """Return posterior theta log prob. $p(\theta|x)$, $-\\infty$ if outside prior.
 
         Args:
             theta:  Parameters $\theta$. If a `transform` is applied, `theta` should be
