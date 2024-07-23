@@ -79,8 +79,8 @@ def _load_prior(task_name):
 		prior = utils.BoxUniform(low=torch.tensor([-1.,-1.,-1.]),
 					 high=torch.tensor([1., 1., 1.]))
 	elif task_name == "MultiIndustryABM":
-		prior = utils.BoxUniform(low=torch.tensor([0., 0., 1., 0.0001, 0., 0.]),
-					 high=torch.tensor([0.5, 1., 2., 0.05, 1., 0.4]))
+		prior = utils.BoxUniform(low=torch.tensor([0., 0., 1., 0.0001, 0., 0., 0.0, 0.25, 0.25]),
+					 high=torch.tensor([0.5, 1., 2., 0.05, 1., 0.4, 1.0, 1.75, 1.75]))
 	return prior
 
 
@@ -121,8 +121,7 @@ def _load_true_pars(task_name):
 	elif task_name == "mvgbm":
 		theta = np.array([0.2,-0.5,0.])
 	elif task_name == "MultiIndustryABM":
-		# theta = np.array([0.25])
-		# theta = np.array([0.1, 0.75, 1.1, 0.005, 0.33, 0.1])
+		# theta = np.array([0.1, 0.75, 1.1, 0.005, 0.33, 0.1, 0.5, 1.0, 1.0])
 		theta = None
 	else:
 		theta = None
