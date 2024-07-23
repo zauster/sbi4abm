@@ -61,8 +61,13 @@ truevalues_dt <- data.table(variable = paste0("V", 1:6),
                                               "financial_needs_buffer_factor",
                                               "markup_reaction_parameter",
                                               "firm_order_market_weighting_parameter",
-                                              "job_search_probability_employed"),
-                            true_value = c(0.1, 0.75, 1.1, 0.005, 0.33, 0.1))
+                                              "job_search_probability_employed",
+                                              "budget_adj_parameter",
+                                              "credit_supply_factor_assets",
+                                              "credit_supply_factor_profits"
+                                              ),
+                            true_value = c(0.1, 0.75, 1.1, 0.005, 0.33, 0.1,
+                                           0.5, 1.0, 1.0))
 
 ## truevalues_toml[truevalues_dt$variable_desc]
 

@@ -33,7 +33,10 @@ class Model:
                                                 "financial_needs_buffer_factor",
                                                 "markup_reaction_parameter",
                                                 "firm_order_market_weighting_parameter",
-                                                "job_search_probability_employed"]
+                                                "job_search_probability_employed",
+                                                "budget_adj_parameter",
+                                                "credit_supply_factor_assets",
+                                                "credit_supply_factor_profits"]
 
 
         def simulate(self, pars = None, T = 100, seed = None):
@@ -57,14 +60,15 @@ class Model:
 
                 tested_random_numbers = []
                 while True:
-                        ## update the config with the parameter determined by the NN and write
-                        ## it to file
+                        ## update the config with the parameter determined by
+                        ## the NN and write it to file
                         simulation_number = str(time.time()).replace(".", "")
                         # print(" --> ", simulation_number, ": writing toml")
                         tested_random_numbers.append(simulation_number)
                         tmpfilename = os.path.join(self.model_path,
                                                    "sbi4abm_configs",
-                                                   "model_config_" + simulation_number +
+                                                   "model_config_" +
+                                                   simulation_number +
                                                    ".toml")
                         with open(tmpfilename, "w") as outputfile:
                                 toml.dump(self.config, outputfile)
