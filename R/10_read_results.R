@@ -8,7 +8,7 @@ library(configr)
 
 ## result_basedir <- "results_methods_500x3_8var"
 ## result_basedir <- "results_allMethods_500x5_twoVar"
-result_basedir <- "results"
+result_basedir <- "results_artificial"
 
 result_dirs <- list.dirs(result_basedir, full.names = TRUE, recursive = FALSE)
 ## result_dirs <- result_dirs[length(result_dirs)]
