@@ -84,7 +84,7 @@ def _load_prior(task_name):
 	return prior
 
 
-def _load_dataset(task_name):
+def _load_dataset(task_name, outloc):
 	if task_name == "bh_noisy":
 		y = np.loadtxt(os.path.join(this_dir, "../data/BH_Noisy/obs.txt"))
 	elif task_name == "bh_smooth":
@@ -98,10 +98,12 @@ def _load_dataset(task_name):
 	elif task_name == "mvgbm":
 		y = np.loadtxt(os.path.join(this_dir, "../data/MVGBM/obs.txt"))[1:]
 	elif task_name == "MultiIndustryABM":
-		print(" ==> MultiIndustryABM using ARTIFICIAL time series")
-		y = np.loadtxt(os.path.join(this_dir, "../data/MultiIndustryABM/artificial_timeseries.txt"))##[0:]
-		# print(" ==> MultiIndustryABM using EMPIRICAL time series")
-		# y = np.loadtxt(os.path.join(this_dir, "../data/MultiIndustryABM/empirical_timeseries.txt"))##[0:]
+		if outloc == "results_artificial":
+			print("==> MultiIndustryABM using ARTIFICIAL time series")
+			y = np.loadtxt(os.path.join(this_dir, "../data/MultiIndustryABM/artificial_timeseries.txt"))
+		elif outloc == "results_empirical":
+			print("==> MultiIndustryABM using EMPIRICAL time series")
+			y = np.loadtxt(os.path.join(this_dir, "../data/MultiIndustryABM/empirical_timeseries.txt"))
 	return y
 
 
@@ -127,10 +129,10 @@ def _load_true_pars(task_name):
 	return theta
 
 
-def load_task(task_name):
+def load_task(task_name, outloc):
 	simulator = _load_simulator(task_name)
 	prior = _load_prior(task_name)
-	y = _load_dataset(task_name)
+	y = _load_dataset(task_name, outloc)
 	start = _load_true_pars(task_name)
 	return simulator, prior, y, start
 

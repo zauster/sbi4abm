@@ -14,18 +14,15 @@ class Model:
                 # self.base_path = "/home/reitero/Arbeit/Projects/local/2023_OeNB_GeneticOptimisation_ABM/models/MultiIndustry_ABM/"
                 self.base_path = "/mnt/extData3/2023_OeNB_GeneticOptimisation_ABM/"
                 self.model_path = os.path.join(self.base_path, "models", "MultiIndustry_ABM")
-                self.calibration_path = os.path.join(self.base_path, "Calibration")
-                # self.sock_file = "/run/user/1000/julia-daemon/conductor.sock"
-                self.starting_period = 11
-                self.timeseries_length = 112
-
                 self.config = toml.load(os.path.join(self.model_path,
                                                      "model_config_5industries.toml"))
+                self.calibration_path = os.path.join(self.base_path, "Calibration")
+                self.starting_period = self.config["real_GDP_base_year_start"]
+                self.timeseries_length = 111
 
                 ## for these simulations, the aggregate output is enough
                 self.config["save_output"] = "aggregates"
                 self.config["check_sfc_consistency"] = False
-                ## set the number of periods
                 self.config["n_periods"] = self.starting_period + self.timeseries_length
 
                 self.experiment_dir = "sbi4abm_results"
@@ -126,7 +123,7 @@ class Model:
                                                                     ],
                                                          ## pyarrow does not work when called in parallel processes
                                                          engine = "fastparquet")
-                                res_dt = res_dt[res_dt["period"] >= self.starting_period].drop(columns = ["period"])
+                                res_dt = res_dt[res_dt["period"] > self.starting_period].drop(columns = ["period"])
                                 res_array = res_dt.to_numpy()
                                 # print("[Simulate] Res array: ", res_array.shape)
                                 # res_array = np.zeros((100, 2))

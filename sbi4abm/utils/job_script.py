@@ -276,7 +276,7 @@ if __name__ == "__main__":
 	# Figure out how many simulations were asked for
 	nsims = _parse_nsims(args.nsims)
 	# Load the objects needed for the task
-	simulator, prior, y, true_theta = io.load_task(args.task)
+	simulator, prior, y, true_theta = io.load_task(args.task, args.outloc)
 
 	# For simulation-based calibration
 	N_RANK_COMPUTATIONS = 5_000
