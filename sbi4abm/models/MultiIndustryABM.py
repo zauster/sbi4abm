@@ -123,7 +123,7 @@ class Model:
                                                                     "aggregate_real_public_consumption_expenditure_growth",
                                                                     # "final_consumption_growth__households":
                                                                     "aggregate_real_private_consumption_expenditure_growth",
-                                                                    "real_GDP_growth__capital" # == "gross_fixed_capital_formation_growth"
+                                                                    "gross_fixed_capital_formation_growth"
                                                                     ],
                                                          ## pyarrow does not work when called in parallel processes
                                                          engine = "fastparquet")
