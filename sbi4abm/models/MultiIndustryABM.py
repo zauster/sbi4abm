@@ -36,7 +36,8 @@ class Model:
                                                 "job_search_probability_employed",
                                                 "budget_adj_parameter",
                                                 "credit_supply_factor_assets",
-                                                "credit_supply_factor_profits"]
+                                                "credit_supply_factor_profits",
+                                                "consumption_propensity_income"]
 
 
         def simulate(self, pars = None, T = 100, seed = None):
