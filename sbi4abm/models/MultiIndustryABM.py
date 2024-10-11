@@ -118,8 +118,8 @@ class Model:
                                                                     "real_GDP_growth__energy",
                                                                     "real_GDP_growth__construction",
                                                                     "real_GDP_growth__services",
-                                                                    "inflation_rate",
-                                                                    "unemployment_rate", ##,
+                                                                    "inflation_rate_pct",
+                                                                    "unemployment_rate_pct", ##,
                                                                     # "final_consumption_growth__government":
                                                                     "aggregate_real_public_consumption_expenditure_growth",
                                                                     # "final_consumption_growth__households":
