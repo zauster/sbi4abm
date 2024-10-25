@@ -37,7 +37,12 @@ class Model:
                                                 "budget_adj_parameter",
                                                 "credit_supply_factor_assets",
                                                 "credit_supply_factor_profits",
-                                                "consumption_propensity_income"]
+                                                "consumption_propensity_income",
+                                                "desired_real_output_inventory_ratio",
+                                                "desired_intermediate_inputs_inventory_factor",
+                                                "profit_retention_ratio_firms",
+                                                "investment_reaction_parameter"
+                                                ]
 
 
         def simulate(self, pars = None, T = 100, seed = None):

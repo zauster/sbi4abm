@@ -1,7 +1,8 @@
 #!/usr/bin/env sh
 set -u
-nsims=${1:-"150x2"}
-output_dir=${2:-"results_artificial"}
+nsims=${1:-"500x2"}
+# output_dir=${2:-"results_artificial"}
+output_dir=${2:-"results_empirical"}
 method=${3:-"maf_gru"}
 nworker=${4:-10}
 
