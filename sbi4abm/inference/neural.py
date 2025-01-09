@@ -99,7 +99,7 @@ def sbi_training(simulator,
 		proposal = posterior.set_default_x(y)
 
 	if not outloc is None:
-		io.save_output(posteriors, None, None, outloc)
+		io.save_output(posteriors, None, None, None, outloc)
 
 	if n_samples > 0:
 		if sampler is None:

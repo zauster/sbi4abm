@@ -158,14 +158,17 @@ def prep_outloc(args):
 	return outloc
 
 
-def save_output(posteriors, samples, ranks, outloc):
+def save_output(posteriors, samples, samples_header, ranks, outloc):
 	if not posteriors is None:
 		loc = os.path.join(outloc, "posteriors.pkl")
 		with open(loc, "wb") as fh:
 			pickle.dump(posteriors, fh)
 	if not samples is None:
 		sample_loc = os.path.join(outloc, "samples.txt")
-		np.savetxt(sample_loc, samples)
+		np.savetxt(fname = sample_loc,
+			   X = samples,
+			   header = " ".join(samples_header),
+			   comments = "")
 	if not ranks is None:
 		ranks_loc = os.path.join(outloc, "ranks.txt")
 		np.savetxt(ranks_loc, ranks)

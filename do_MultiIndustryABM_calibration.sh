@@ -5,6 +5,7 @@ nsims=${1:-"500x2"}
 output_dir=${2:-"results_empirical"}
 method=${3:-"maf_gru"}
 nworker=${4:-10}
+nsamples=${5:-10000}
 
 ## Script for killing juliaclient zombie threads:
 # ./kill_jc_crashed.sh > kill_jc.log &
@@ -18,7 +19,8 @@ python sbi4abm/utils/job_script.py \
     --method=${method} \
     --outloc=${output_dir} \
     --nsims=${nsims} \
-    --nw=${nworker}
+    --nw=${nworker} \
+    --nsamples=${nsamples}
 
 ## deactivate python environment
 deactivate

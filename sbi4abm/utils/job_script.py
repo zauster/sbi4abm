@@ -11,12 +11,10 @@ import warnings
 
 
 def _parse_nsims(nsims):
-
 	"""
 	Allows nsims in either format of list, in which case interpreted as list
 	of simulations at each round, or of string
 	"""
-
 	if len(nsims) == 1:
 		n = nsims[0].split("x")
 		if len(n) == 1:
@@ -27,22 +25,23 @@ def _parse_nsims(nsims):
 	else:
 		return list(map(int, nsims))
 
-def _de2class(de_name):
 
+def _de2class(de_name):
 	"""
 	Infers posterior estimation technique from densit estimator name
 	"""
-
 	if de_name in ["maf", "nsf", "made", "mdn"]:
 		return "SNPE"
 	else:
 		return "SNRE"
+
 
 def _acf(x, lag):
 	"""
 	Computes autocorrelation at specified lag for 1D time series
 	"""
 	return np.dot(x[:-lag], x[lag:]) / (x.shape[0] - 1)
+
 
 class Summariser1D:
 
@@ -269,6 +268,8 @@ if __name__ == "__main__":
 						help="Location to load an pretrained posterior from")
 	parser.add_argument('--nw', type=int, nargs="?", default=15,
 						help="Number of workers to use in simulating for sbi")
+	parser.add_argument('--nsamples', type=int, nargs="?", default=10000,
+						help="Number of samples to draw from the posterior. Only used with SNPE methods.")
 	args = parser.parse_args()
 
 	# Prepare the outloc
@@ -332,7 +333,8 @@ if __name__ == "__main__":
 
 		# Sample
 		if sbi_method == "SNPE":
-			N_SAMPLES = 10_000
+			# N_SAMPLES = 10_000
+			N_SAMPLES = args.nsamples
 			sampler = None
 		elif sbi_method == "SNRE":
 			if args.sampler == "sir":
@@ -355,7 +357,9 @@ if __name__ == "__main__":
 								  num_workers=args.nw,
 								  z_score_x=z_score_x,
 								  outloc=outloc)
-			io.save_output(posteriors, samples, ranks, outloc)
+			io.save_output(posteriors, samples,
+				       simulator.model.parameters_to_calibrate,
+				       ranks, outloc)
 		else:
 			with open(args.load_post, "rb") as fh:
 				posteriors = pickle.load(fh)
@@ -380,4 +384,6 @@ if __name__ == "__main__":
 							     scale=args.scale,
 							     n_jobs=2)
 
-	io.save_output(posteriors, samples, ranks, outloc)
+	io.save_output(posteriors, samples,
+		       simulator.model.parameters_to_calibrate,
+		       ranks, outloc)
