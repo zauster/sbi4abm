@@ -7,6 +7,7 @@ library(ggthemes)
 library(configr) ## just for reading toml
 library(toml) ## just for writing toml
 library(stringr)
+library(lubridate)
 
 estimate_mode <- function(x) {
   d <- density(x)
@@ -23,6 +24,7 @@ result_dirs <- list.dirs(result_basedir,
   str_subset("backup", negate = TRUE)
 ## result_dirs <- result_dirs[length(result_dirs)]
 ## input_dir <- result_dirs[length(result_dirs)]
+print(result_dirs)
 
 result_list <- list()
 for(input_dir in result_dirs) {
@@ -32,11 +34,12 @@ for(input_dir in result_dirs) {
   samples_file <- file.path(input_dir, "samples.txt")
   if(file.exists(samples_file)) {
     tmp <- fread(samples_file)
-    ## we just add the input_dir so that 'melt' does not complain
-    setnames(tmp, paste0("V", str_pad(as.character(1:length(colnames(tmp))),
-                                      width = 2, side = "left", pad = "0")))
+    ## ## we just add the input_dir so that 'melt' does not complain
+    ## setnames(tmp, paste0("V", str_pad(as.character(1:length(colnames(tmp))),
+    ##                                   width = 2, side = "left", pad = "0")))
     tmp[, dir_name := input_dir]
-    tmp <- melt(tmp, id.vars = c("dir_name"))
+    tmp <- melt(tmp, id.vars = c("dir_name"),
+                variable.factor = FALSE)
     tmp[, dir_name := NULL]
 
     ## get the description of the algorithm that was run
@@ -57,71 +60,107 @@ for(input_dir in result_dirs) {
   }
 }
 
-res_dt <- rbindlist(result_list)
+## res_dt <- rbindlist(result_list)
+res_dt <- rbindlist(result_list, fill = TRUE)
 res_dt[, table(variable)]
 res_dt[, table(nsims)]
 
-## truevalues_dt <- data.table(variable = c("V1", "V2"),
-##                             variable_desc = c("expectation reaction parameter",
-##                                               "markup reaction parameter"),
-##                             true_value = c(0.25, 0.001))
+## restrict samples to "meaningful" nsims
+res_dt[, nsims := str_remove_all(nsims, "[:punct:]")]
+res_dt[, c("niterations", "nbatches") := tstrsplit(nsims, "x", type.convert = TRUE)]
+res_dt[, table(niterations)]
+res_dt <- res_dt[niterations >= 500, ]
 
-true_toml_config <- file.path("/mnt/extData3/2023_OeNB_GeneticOptimisation_ABM/models/MultiIndustry_ABM/model_config_5industries.toml")
-truevalues_toml <- read.config(true_toml_config)
+## get the 'true' values of the variables, if comparing artificial
+## timeseries
+toml_config_path <- file.path("/mnt/extData3/2023_OeNB_GeneticOptimisation_ABM/models/MultiIndustry_ABM/model_config_5industries.toml")
+toml_config <- read.config(toml_config_path)
 
 truevalues_dt <- fread(
 "
+variable, true_value
 expectation_reaction_parameter, 0.1
-inflation_adj_parameter, 0.7
-financial_needs_buffer_factor, 1.1
-markup_reaction_parameter, 0.005
-firm_order_market_weighting_parameter, 0.33
-job_search_probability_employed, 0.1
-budget_adj_parameter, 0.5
-credit_supply_factor_assets, 1.5
-credit_supply_factor_profits, 1.5
 consumption_propensity_income, 0.953
 desired_real_output_inventory_ratio, 0.54
 desired_intermediate_inputs_inventory_factor, 2.14
+inflation_adj_parameter, 0.7
+markup_reaction_parameter, 0.005
+firm_order_market_weighting_parameter, 0.33
+budget_adj_parameter, 0.5
+unempl_react_parameter, 1.0
 profit_retention_ratio_firms, 0.0
+credit_supply_factor_assets, 1.5
+credit_supply_factor_profits, 1.5
+job_search_probability_employed, 0.1
+financial_needs_buffer_factor, 1.1
 investment_reaction_parameter, 0.5
-", header = FALSE)
-truevalues_dt[, variable := paste0("V", str_pad(as.character(1:nrow(truevalues_dt)),
-                                                width = 2, side = "left", pad = "0"))]
+", header = TRUE)
 
 ## Merge the 'true' values
 res_dt <- merge(res_dt, truevalues_dt,
-                by = "variable")
+                by = "variable", all.x = TRUE)
 
 ## Make the variable descriptions a little more prettier
-res_dt[, variable_desc_pretty := str_replace_all(variable_desc, "_", " ") |>
+res_dt[, variable_desc_pretty := str_replace_all(variable, "_", " ") |>
            str_to_sentence()]
 
+## Also create a better descriptor of the calibration run
+res_dt[, calibration_time_msec := str_replace_all(dir_name,
+                                            "results_empirical/", "") |>
+       str_replace_all("\\.[0-9]+$", "")]
+res_dt[, calibration_time := as.POSIXct(as.numeric(calibration_time_msec))]
+
+res_dt <- res_dt[calibration_time >= "2024-12-20", ]
+
+timestamp_ids <- c("singleMarket", "twoMarkets", "singleMarket", "singleMarket")
+names(timestamp_ids) <- res_dt[, unique(calibration_time_msec)]
+## timestamps <- res_dt[, unique(calibration_time_msec)]
+## res_dt[, calibration_indicator := ""]
+res_dt[, calibration_indicator := str_replace_all(calibration_time_msec,
+                                                  timestamp_ids)]
+
+res_dt[, calibration_run_name := paste0(
+           str_replace_all(as.character(calibration_time), c(":" = "", "-" = "", " " = "_")),
+           "_", network, "_", calibration_indicator)]
+
 ## Compute mean, mode and median of the distributions
-res_dt[, mean := mean(value), by = .(variable)]
-res_dt[, mode := estimate_mode(round(value, digits = 4)), by = .(variable)]
-res_dt[, median := median(value), by = .(variable)]
+res_dt[, mean := mean(value),
+       by = .(variable, calibration_run_name)]
+res_dt[, mode := estimate_mode(round(value, digits = 4)),
+       by = .(variable, calibration_run_name)]
+res_dt[, median := median(value),
+       by = .(variable, calibration_run_name)]
 
 ## Compute mean, mode and median of the distributions and save the
 ## found mode of the parameter samples as the calibrated parameter.
 calibrated_parameters <- res_dt %>%
-  .[nsims == "['200x2']", ] %>%
   .[, .(mode = round(estimate_mode(round(value, digits = 4)), digits = 4),
-             mean = round(mean(value), digits = 4),
-             median = round(median(value), digits = 4)),
-         keyby = .(variable_desc)]
+        mean = round(mean(value), digits = 4),
+        median = round(median(value), digits = 4),
+        cv = sd(value) / mean(value)
+        ),
+    keyby = .(variable, calibration_run_name)]
 calibrated_parameters
 
-calibrated_values_config <- copy(truevalues_toml)
-for(parameter in calibrated_parameters$variable_desc) {
-  ## message("-> ", parameter)
-  calibrated_values_config[[parameter]] <-
-    calibrated_parameters[variable_desc == parameter, mode]
+## By default, write the values from the newest calibration run to
+## file
+for(calibration_name in res_dt[, unique(calibration_run_name)]) {
+  message("=> ", calibration_name)
+  calibrated_parameters_to_save <- calibrated_parameters[calibration_run_name == calibration_name, ]
+  calibrated_values_config <- copy(toml_config)
+  for(statistic in c("mode", "mean", "median")) {
+    message("--> Writing .toml for statistic: ", statistic)
+    for(parameter in calibrated_parameters_to_save$variable) {
+      calibrated_values_config[[parameter]] <-
+        calibrated_parameters_to_save[variable == parameter, get(statistic)]
+    }
+    calibrated_toml_config <-
+      str_replace_all(toml_config_path, "5industries",
+                      paste0("5industries_calibrated_", statistic, "_", calibration_name))
+    write_toml(calibrated_values_config,
+               calibrated_toml_config)
+  }
 }
-calibrated_toml_config <- str_replace_all(true_toml_config,
-                                         "5industries", "5industries_calibrated")
-write_toml(calibrated_values_config,
-           calibrated_toml_config)
 
 
 
@@ -139,17 +178,21 @@ p1 <- p1 + geom_vline(aes(xintercept = median), linewidth = 1,
                       colour = "orange")
 p1 <- p1 + geom_vline(aes(xintercept = mode), linewidth = 1,
                       colour = "brown")
-p1 <- p1 + geom_density(aes(colour = nsims), linewidth = 1) +
+p1 <- p1 + geom_density(aes(colour = factor(calibration_time)),
+                        linewidth = 1) +
   facet_wrap(~ variable_desc_pretty, scales = "free") +
   xlab("") + ylab("") +
   theme_clean() +
   ggtitle(label = "",
           subtitle = "True value (if applicable, grey); mean (green), median (orange), mode (brown)") +
-  scale_colour_ptol()
+  scale_colour_ptol("Calibration run")
 p1
 
 ggsave(plot = p1, height = plot_width, width = plot_height,
-       filename = paste0("plots/", result_basedir, "_hist1.png"))
+       filename = paste0("plots/", result_basedir, "_",
+                         str_replace_all(as.Date(res_dt[, max(calibration_time)]),
+                                         "-", ""),
+                         "_hist1.png"))
 
 
 ##============================================================
@@ -157,7 +200,7 @@ ggsave(plot = p1, height = plot_width, width = plot_height,
 ## p_gru <- ggplot(res_dt[embedding == "gru", ], aes(x = value)) +
 ##   geom_vline(aes(xintercept = true_value), linewidth = 1, colour = "lightgrey") +
 ##   geom_density(aes(colour = network), linewidth = 1) +
-##   facet_wrap( ~ variable_desc, scales = "free") +
+##   facet_wrap( ~ variable, scales = "free") +
 ##   xlab("") + ylab("") +
 ##   theme_clean() +
 ##   theme(strip.text = element_text(size = 15)) +
@@ -169,8 +212,8 @@ ggsave(plot = p1, height = plot_width, width = plot_height,
 ## p2 <- ggplot(res_dt, aes(x = value)) +
 ##   geom_vline(aes(xintercept = true_value), linewidth = 1, colour = "lightgrey") +
 ##   geom_density(aes(colour = embedding), linewidth = 1) +
-##   ## facet_grid(network ~ variable_desc, scales = "free") +
-##   facet_wrap( ~ network + variable_desc, scales = "free") +
+##   ## facet_grid(network ~ variable, scales = "free") +
+##   facet_wrap( ~ network + variable, scales = "free") +
 ##   xlab("") + ylab("") +
 ##   theme_clean() +
 ##   scale_colour_ptol()
@@ -181,9 +224,10 @@ ggsave(plot = p1, height = plot_width, width = plot_height,
 ## p3 <- ggplot(res_dt, aes(x = value)) +
 ##   geom_vline(aes(xintercept = true_value), linewidth = 1, colour = "lightgrey") +
 ##   geom_density(aes(colour = network), linewidth = 1) +
-##   ## facet_grid(embedding ~ variable_desc, scales = "free") +
-##   facet_wrap( ~ embedding + variable_desc, scales = "free") +
+##   ## facet_grid(embedding ~ variable, scales = "free") +
+##   facet_wrap( ~ embedding + variable, scales = "free") +
 ##   xlab("") + ylab("") +
 ##   theme_clean() +
 ##   scale_colour_ptol()
 ## p3
+
