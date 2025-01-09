@@ -28,21 +28,23 @@ class Model:
                 self.experiment_dir = "sbi4abm_results"
                 # self.experiment_dir = "test"
                 self.empirical_parameters_file = self.config["empirical_parameters_file"]
-                self.parameters_to_calibrate = ["expectation_reaction_parameter",
-                                                "inflation_adj_parameter",
-                                                "financial_needs_buffer_factor",
-                                                "markup_reaction_parameter",
-                                                "firm_order_market_weighting_parameter",
-                                                "job_search_probability_employed",
-                                                "budget_adj_parameter",
-                                                "credit_supply_factor_assets",
-                                                "credit_supply_factor_profits",
-                                                "consumption_propensity_income",
-                                                "desired_real_output_inventory_ratio",
-                                                "desired_intermediate_inputs_inventory_factor",
-                                                "profit_retention_ratio_firms",
-                                                "investment_reaction_parameter"
-                                                ]
+                self.parameters_to_calibrate = [
+                        "expectation_reaction_parameter",
+                        "consumption_propensity_income",
+                        "desired_real_output_inventory_ratio",
+                        "desired_intermediate_inputs_inventory_factor",
+                        "inflation_adj_parameter",
+                        # "financial_needs_buffer_factor",
+                        "markup_reaction_parameter",
+                        # "firm_order_market_weighting_parameter",
+                        "job_search_probability_employed",
+                        # "budget_adj_parameter",
+                        "profit_retention_ratio_firms",
+                        "credit_supply_factor_assets"#,
+                        # "credit_supply_factor_profits" # has hardly any impact
+                        # "investment_reaction_parameter"
+                        # "unempl_react_parameter"
+                ]
 
 
         def simulate(self, pars = None, T = 100, seed = None):

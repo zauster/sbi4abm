@@ -79,8 +79,39 @@ def _load_prior(task_name):
 		prior = utils.BoxUniform(low=torch.tensor([-1.,-1.,-1.]),
 					 high=torch.tensor([1., 1., 1.]))
 	elif task_name == "MultiIndustryABM":
-		prior = utils.BoxUniform(low  = torch.tensor([0.0, 0., 1., 0.0001, 0., 0.0, 0., 0.25, 0.25, 0.80, 0.1, 1.25, 0.0, 0.0]),
-					 high = torch.tensor([0.5, 1., 2., 0.0500, 1., 0.4, 1., 1.75, 1.75, 0.99, 0.9, 2.50, 1.0, 1.0]))
+		prior = utils.BoxUniform(
+			low  = torch.tensor([0.05, # "expectation_reaction_parameter",
+					     0.70, # "consumption_propensity_income",
+					     0.1, # "desired_real_output_inventory_ratio",
+					     1.25, # "desired_intermediate_inputs_inventory_factor",
+					     0.25, # "inflation_adj_parameter",
+					     #1.0, # "financial_needs_buffer_factor",
+					     0.0001, # "markup_reaction_parameter",
+					     # 0.0, # "firm_order_market_weighting_parameter",
+					     0.0, # "job_search_probability_employed",
+					     # 0.0, # "budget_adj_parameter",
+					     0.0, # "profit_retention_ratio_firms",
+					     1.0#, # "credit_supply_factor_assets",
+					     # 1.0 # "credit_supply_factor_profits"
+					     # 0.0 # "investment_reaction_parameter"
+					     # 1.0 # "unempl_react_parameter"
+					     ]),
+			high = torch.tensor([0.3, # "expectation_reaction_parameter",
+					     0.99, # "consumption_propensity_income",
+					     0.75, # "desired_real_output_inventory_ratio",
+					     2.50, # "desired_intermediate_inputs_inventory_factor",
+					     0.9, # "inflation_adj_parameter",
+					     #2.0, # "financial_needs_buffer_factor",
+					     0.0200, # "markup_reaction_parameter",
+					     # 1.0, # "firm_order_market_weighting_parameter",
+					     0.4, # "job_search_probability_employed",
+					     # 1.0, # "budget_adj_parameter",
+					     0.5, # "profit_retention_ratio_firms",
+					     2.0#, # "credit_supply_factor_assets",
+					     # 2.0 # "credit_supply_factor_profits"
+					     # 1.0 # "investment_reaction_parameter"
+					     # 2.0 # "unempl_react_parameter"
+					     ]))
 	return prior
 
 
