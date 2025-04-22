@@ -18,7 +18,8 @@ def _parse_nsims(nsims):
 	if len(nsims) == 1:
 		n = nsims[0].split("x")
 		if len(n) == 1:
-			return list(map(int, n))
+			# return list(map(int, n))
+			return list(map(int, n[0].split(" ")))
 		elif len(n) == 2:
 			n, r = n[0], n[1]
 			return [int(n) for i in range(int(r))]

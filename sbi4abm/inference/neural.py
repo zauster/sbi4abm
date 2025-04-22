@@ -69,6 +69,8 @@ def sbi_training(simulator,
 		 z_score_x=True,
 		 outloc=None):
 
+	print("Running the simulation batches: ", n_sims)
+
 	sbi_simulator, sbi_prior = prepare_for_sbi(simulator, prior)
 	posteriors = []
 	proposal = sbi_prior
