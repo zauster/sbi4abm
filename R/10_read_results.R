@@ -73,7 +73,7 @@ res_dt <- res_dt[niterations >= 500, ]
 
 ## get the 'true' values of the variables, if comparing artificial
 ## timeseries
-toml_config_path <- file.path("/mnt/extData3/2023_OeNB_GeneticOptimisation_ABM/models/MultiIndustry_ABM/model_config_5industries.toml")
+toml_config_path <- file.path("/mnt/extData3/2023_OeNB_GeneticOptimisation_ABM/models/MultiIndustry_ABM/model_config.toml")
 toml_config <- read.config(toml_config_path)
 
 truevalues_dt <- fread(
@@ -112,8 +112,10 @@ res_dt[, calibration_time := as.POSIXct(as.numeric(calibration_time_msec))]
 
 res_dt <- res_dt[calibration_time >= "2024-12-20", ]
 
-timestamp_ids <- c("singleMarket", "twoMarkets", "singleMarket", "singleMarket")
-names(timestamp_ids) <- res_dt[, unique(calibration_time_msec)]
+timestamps <- res_dt[, unique(calibration_time_msec)]
+timestamp_ids <- c("twoMarkets", "singleMarket")
+## timestamp_ids <- rep("twoMarkets", length = length(timestamps))
+names(timestamp_ids) <- timestamps
 ## timestamps <- res_dt[, unique(calibration_time_msec)]
 ## res_dt[, calibration_indicator := ""]
 res_dt[, calibration_indicator := str_replace_all(calibration_time_msec,
@@ -144,7 +146,11 @@ calibrated_parameters
 
 ## By default, write the values from the newest calibration run to
 ## file
-for(calibration_name in res_dt[, unique(calibration_run_name)]) {
+calibrations_to_save_to_toml <-
+  res_dt[calibration_time == max(calibration_time),
+         unique(calibration_run_name)]
+## res_dt[, unique(calibration_run_name)]
+for(calibration_name in calibrations_to_save_to_toml) {
   message("=> ", calibration_name)
   calibrated_parameters_to_save <- calibrated_parameters[calibration_run_name == calibration_name, ]
   calibrated_values_config <- copy(toml_config)
@@ -154,14 +160,21 @@ for(calibration_name in res_dt[, unique(calibration_run_name)]) {
       calibrated_values_config[[parameter]] <-
         calibrated_parameters_to_save[variable == parameter, get(statistic)]
     }
+    ## Also set the calibration data name to a new value, so that we
+    ## can easier call 00_runAllScripts with this model_config:
+    calibrated_values_config[["calibrated_parameters"]] <-
+      paste0("calibrated_model_parameters_", statistic, "_",
+             calibration_name, ".RData")
+
+    ## Create new filename and write .toml to disk:
     calibrated_toml_config <-
-      str_replace_all(toml_config_path, "5industries",
-                      paste0("5industries_calibrated_", statistic, "_", calibration_name))
+      file.path(dirname(toml_config_path),
+                paste0("model_config_calibrated_",
+                       statistic, "_", calibration_name, ".toml"))
     write_toml(calibrated_values_config,
                calibrated_toml_config)
   }
 }
-
 
 
 plot_width <- 7
@@ -186,7 +199,7 @@ p1 <- p1 + geom_density(aes(colour = factor(calibration_time)),
   ggtitle(label = "",
           subtitle = "True value (if applicable, grey); mean (green), median (orange), mode (brown)") +
   scale_colour_ptol("Calibration run")
-p1
+## p1
 
 ggsave(plot = p1, height = plot_width, width = plot_height,
        filename = paste0("plots/", result_basedir, "_",
