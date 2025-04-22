@@ -11,10 +11,10 @@ nsamples=${5:-10000}
 # ./kill_jc_crashed.sh > kill_jc.log &
 
 ## activates the python environment
-source venv_sbi4abm/bin/activate
+source venv_sbi4abm_312/bin/activate
 
 echo "=> Running the sbi4abm algorithm"
-python sbi4abm/utils/job_script.py \
+python3.12 sbi4abm/utils/job_script.py \
     --task=MultiIndustryABM \
     --method=${method} \
     --outloc=${output_dir} \
